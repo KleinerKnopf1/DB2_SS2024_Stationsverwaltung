@@ -8,11 +8,6 @@ public interface Repository {
 	public Room saveRoom();
 	
 	
-	
-	
-	
-	
-		
 }
 
 
