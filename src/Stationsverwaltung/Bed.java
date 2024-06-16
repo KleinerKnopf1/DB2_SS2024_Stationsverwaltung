@@ -1,7 +1,7 @@
 package Stationsverwaltung;
 
 
-public final class Bed {
+public  class Bed {
 	
 	int bedID;
 	
