@@ -16,6 +16,7 @@ public interface Repository {
 	  void save(Room msg) throws Exception;
 	  List<Room> get(Room.Filter filter);
 	  Optional<Room> Room(Id<Room> id);
+	  
 	  void delete(Id<Room> id); 
 	 
 	 Id<Bed> BedID();

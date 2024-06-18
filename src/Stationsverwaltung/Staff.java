@@ -1,6 +1,8 @@
 package Stationsverwaltung;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
+
 
 public record Staff
 (
@@ -11,7 +13,15 @@ public record Staff
   String function
 )
 {
-
-
+	
+	  public static record Filter
+	  (
+	    Optional<String> name,
+	    Optional<String> prename,
+	    Optional<LocalDateTime> birthday,
+	    Optional<String> function
+	    
+	  )
+	  {}
 
 }
