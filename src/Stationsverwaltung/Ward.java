@@ -46,7 +46,7 @@ public record Ward
 
 	  public static record Filter
 	  (
-	    Optional<Set<Ward>> name
+	    Optional<String> name
 	  )
 	  {}
 
