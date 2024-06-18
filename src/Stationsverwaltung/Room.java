@@ -1,10 +1,13 @@
 package Stationsverwaltung;
 
-public class Room {
 
-		int roomNr;
-		String roomName;
-		
-		
+public  record Room (
+		Id<Room> id,
+		String roomName,
+		Reference<Ward> ward
+		)
+
+{
 	
+
 }

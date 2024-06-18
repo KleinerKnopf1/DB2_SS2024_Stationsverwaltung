@@ -1,11 +1,13 @@
 package Stationsverwaltung;
 
 
-public  class Bed {
-	
-	int bedID;
-	
-	
+public  record Bed (
+		Id<Ward> id,
+		String name,
+		Reference<Room> room
+		)
+
+{
 	
 
 }
