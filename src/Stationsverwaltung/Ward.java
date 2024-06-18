@@ -53,7 +53,7 @@ public record Ward
 	  {
 	    Ward process(Command cmd) throws Exception;
 
-	    List<Stationsverwaltung.Ward> getWards(Filter filter);
+	    List<Stationsverwaltung.Ward> getWard(Filter filter);
 
 	    Optional<Stationsverwaltung.Ward> getWard(Id<Stationsverwaltung.Ward> id);
 	  }

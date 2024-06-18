@@ -19,8 +19,6 @@ public class Wardmanagementservice implements IWardmanagementservice {
     this.pm = pm;
   }
 
-
-  // Singleton pattern
   private static final Wardmanagementservice INSTANCE =
     new Wardmanagementservice(
       Repository.loadInstance(),
@@ -38,7 +36,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 		return null;
 	}
 	@Override
-	public List<Ward> getWards(Filter filter) {
+	public List<Ward> getWard(Filter filter) {
 		// TODO Auto-generated method stub
 		return null;
 	}
