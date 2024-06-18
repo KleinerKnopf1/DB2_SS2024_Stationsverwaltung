@@ -10,6 +10,7 @@ public interface Repository {
 	  void save(Ward tc) throws Exception;	
 	  List<Ward> get(Ward.Filter filter);	
 	  Optional<Ward> getWard(Id<Ward> id);
+	  
 
 
 	 Id<Room> RoomID();
@@ -17,21 +18,20 @@ public interface Repository {
 	  List<Room> get(Room.Filter filter);
 	  Optional<Room> Room(Id<Room> id);
 	  
-	  void delete(Id<Room> id); 
+	
 	 
 	 Id<Bed> BedID();
 	  void save(Bed msg) throws Exception;
 	  List<Room> get(Bed.Filter filter);
 	  Optional<Bed> Bed(Id<Bed> id);
-	  void delete(Id<Bed> id);
+	  
 	  
 	  
 	 Id<Staff> StaffID();
 	  void save(Staff msg) throws Exception;
 	  List<Staff> get(Staff.Filter filter);
 	  Optional<Staff> Staff(Id<Staff> id);
-	  void delete(Id<Staff> id);
-	  
+	 
 	  //Was macht das? Ab hier noch Code Anpassen bisher nur copy paste von clins Repository class
 	  public static interface Provider
 	  { 
