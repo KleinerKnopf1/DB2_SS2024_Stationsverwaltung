@@ -1,10 +1,10 @@
-package de.db2.wardmanagement;
+package de.db2.wardmanagement.data;
 
 
 import java.util.ServiceLoader;
 
-import de.db2.wardmanagement.entities.Patient;
-import de.db2.wardmanagement.type.Reference;
+import de.db2.wardmanagement.backend.entity.Patient;
+import de.db2.wardmanagement.backend.type.Reference;
 
 public interface Personmanagement
 {
