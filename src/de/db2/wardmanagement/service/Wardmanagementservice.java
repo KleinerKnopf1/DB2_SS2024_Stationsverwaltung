@@ -10,6 +10,7 @@ import de.db2.wardmanagement.entities.Room;
 import de.db2.wardmanagement.entities.Ward;
 import de.db2.wardmanagement.entities.Ward.Command;
 import de.db2.wardmanagement.entities.Ward.Filter;
+import de.db2.wardmanagement.type.Id;
 
 public class Wardmanagementservice implements IWardmanagementservice {
 	
