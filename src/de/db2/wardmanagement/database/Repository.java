@@ -1,8 +1,14 @@
-package Stationsverwaltung;
+package de.db2.wardmanagement.database;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.ServiceLoader;
+
+import de.db2.wardmanagement.entities.Bed;
+import de.db2.wardmanagement.entities.Room;
+import de.db2.wardmanagement.entities.Staff;
+import de.db2.wardmanagement.entities.Ward;
+import de.db2.wardmanagement.type.Id;
 
 public interface Repository {
 	

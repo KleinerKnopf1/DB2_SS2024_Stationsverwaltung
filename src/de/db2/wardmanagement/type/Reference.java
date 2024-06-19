@@ -1,4 +1,4 @@
-package Stationsverwaltung;
+package de.db2.wardmanagement.type;
 
 import java.util.Optional;
 

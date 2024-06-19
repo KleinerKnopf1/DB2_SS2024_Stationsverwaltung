@@ -1,7 +1,9 @@
-package Stationsverwaltung;
+package de.db2.wardmanagement.entities;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+
+import de.db2.wardmanagement.type.Id;
 
 
 public record Staff

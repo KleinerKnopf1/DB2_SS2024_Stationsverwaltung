@@ -1,7 +1,10 @@
-package Stationsverwaltung;
+package de.db2.wardmanagement.entities;
 
 import java.util.List;
 import java.util.Optional;
+
+import de.db2.wardmanagement.type.Id;
+import de.db2.wardmanagement.type.Reference;
 
 public  record Room (
 		Id<Room> id,
@@ -46,9 +49,9 @@ public  record Room (
 	  {
 	    Room process(Command cmd) throws Exception;
 
-	    List<Stationsverwaltung.Room> getRooms(Filter filter);
+	    List<de.db2.wardmanagement.entities.Room> getRooms(Filter filter);
 
-	    Optional<Stationsverwaltung.Room> getRoom(Id<Stationsverwaltung.Room> id);
+	    Optional<de.db2.wardmanagement.entities.Room> getRoom(Id<de.db2.wardmanagement.entities.Room> id);
 	  }
 	
 

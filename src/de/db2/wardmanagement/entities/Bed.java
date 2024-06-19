@@ -1,8 +1,11 @@
-package Stationsverwaltung;
+package de.db2.wardmanagement.entities;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import de.db2.wardmanagement.type.Id;
+import de.db2.wardmanagement.type.Reference;
 
 public  record Bed (
 		Id<Bed> id,
@@ -60,9 +63,9 @@ public  record Bed (
 	  {
 	    Bed process(Command cmd) throws Exception;
 
-	    List<Stationsverwaltung.Bed> getBeds(Filter filter);
+	    List<de.db2.wardmanagement.entities.Bed> getBeds(Filter filter);
 
-	    Optional<Stationsverwaltung.Bed> getBed(Id<Stationsverwaltung.Bed> id);
+	    Optional<de.db2.wardmanagement.entities.Bed> getBed(Id<de.db2.wardmanagement.entities.Bed> id);
 	  }
 
 }

@@ -1,7 +1,10 @@
-package Stationsverwaltung;
+package de.db2.wardmanagement.entities;
 
 import java.util.List;
 import java.util.Optional;
+
+import de.db2.wardmanagement.type.Id;
+import de.db2.wardmanagement.type.Reference;
 public record Ward
 	(
 	  Id<Ward> id,
@@ -53,9 +56,9 @@ public record Ward
 	  {
 	    Ward process(Command cmd) throws Exception;
 
-	    List<Stationsverwaltung.Ward> getWard(Filter filter);
+	    List<de.db2.wardmanagement.entities.Ward> getWard(Filter filter);
 
-	    Optional<Stationsverwaltung.Ward> getWard(Id<Stationsverwaltung.Ward> id);
+	    Optional<de.db2.wardmanagement.entities.Ward> getWard(Id<de.db2.wardmanagement.entities.Ward> id);
 	  }
 
 

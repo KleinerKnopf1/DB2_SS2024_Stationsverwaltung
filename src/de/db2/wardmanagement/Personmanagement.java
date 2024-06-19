@@ -1,7 +1,10 @@
-package Stationsverwaltung;
+package de.db2.wardmanagement;
 
 
 import java.util.ServiceLoader;
+
+import de.db2.wardmanagement.entities.Patient;
+import de.db2.wardmanagement.type.Reference;
 
 public interface Personmanagement
 {
