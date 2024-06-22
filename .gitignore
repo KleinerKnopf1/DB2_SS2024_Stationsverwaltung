@@ -1,4 +1,4 @@
 /bin/
 .classpath
-module-info.java
+src/module-info.java
 
