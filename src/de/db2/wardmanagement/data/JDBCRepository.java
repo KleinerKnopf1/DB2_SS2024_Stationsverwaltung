@@ -33,7 +33,7 @@ import de.db2.wardmanagement.backend.entity.Staff;
 
 
 
-class JDBCRepository implements Repository
+public class JDBCRepository implements Repository
 {
 
   // Service Provider Interface (SPI)  
@@ -48,9 +48,7 @@ class JDBCRepository implements Repository
 
   }
 
-  private static final Base64.Decoder DECODER = Base64.getDecoder();
-  private static final Base64.Encoder ENCODER = Base64.getEncoder();
-
+  
   private final Connection conn;
 
 
@@ -65,9 +63,9 @@ class JDBCRepository implements Repository
     try {
       var conn =
         DriverManager.getConnection(
-          System.getProperty("stationsverwaltung.repo.jdbc.url"),
-          System.getProperty("stationsverwaltung.repo.jdbc.user"),
-          System.getProperty("stationsverwaltung.repo.jdbc.password")
+          System.getProperty("wardstation.repo.jdbc.url"),
+          System.getProperty("wardstation.repo.jdbc.user"),
+          System.getProperty("wardstation.repo.jdbc.password")
         );
 
       var repo = new JDBCRepository(conn);
@@ -84,513 +82,280 @@ class JDBCRepository implements Repository
 
   // NOTE: 
   // Column renamed explicitly "end_ts", because "end" seems to be a reserved keyword in SQL and leads to SQL syntax errors
-  private static final String CREATE_TABLE_STATIONSVERWALTUNG = """
-    CREATE TABLE IF NOT EXISTS teleconsultations (
-      id UUID PRIMARY KEY,
-      patient UUID NOT NULL,
-      doctor UUID NOT NULL,
-      status VARCHAR(10) NOT NULL,
-      start_ts TIMESTAMP NOT NULL,
-      end_ts TIMESTAMP, 
-      lastUpdate TIMESTAMP NOT NULL
-    );
-  """;
+  private static final String CREATE_TABLE_WARDS = """
+	        CREATE TABLE IF NOT EXISTS wards (
+	            id UUID PRIMARY KEY,
+	            name VARCHAR(255) NOT NULL,
+	            lastUpdate TIMESTAMP NOT NULL
+	        );
+	    """;
 
-  private static final String CREATE_TABLE_MESSAGES = """
-    CREATE TABLE IF NOT EXISTS messages (
-      id UUID PRIMARY KEY,
-      teleconsultation UUID NOT NULL REFERENCES teleconsultations(id),
-      author UUID NOT NULL,
-      posted_at TIMESTAMP NOT NULL,
-      text VARCHAR NOT NULL,
-      attachment VARCHAR, 
-      lastUpdate TIMESTAMP NOT NULL
-    );
-  """;
+  private static final String CREATE_TABLE_ROOMS = """
+	        CREATE TABLE IF NOT EXISTS rooms (
+	            roomNr INT PRIMARY KEY,
+	            roomName VARCHAR(255) NOT NULL,
+	            ward UUID REFERENCES wards(id),
+	            lastUpdate TIMESTAMP NOT NULL
+	        );
+	    """;
+  
+  private static final String CREATE_TABLE_BEDS = """
+	        CREATE TABLE IF NOT EXISTS beds (
+	            bedID UUID PRIMARY KEY,
+	            patient UUID,
+	            roomNr INT REFERENCES rooms(roomNr),
+	            lastUpdate TIMESTAMP NOT NULL
+	        );
+	    """;
+  
+  private static final String CREATE_TABLE_STAFF = """
+	        CREATE TABLE IF NOT EXISTS staff (
+	            staffID UUID PRIMARY KEY,
+	            preName VARCHAR(255),
+	            name VARCHAR(255) NOT NULL,
+	            birthday DATE,
+	            function VARCHAR(255),
+	            lastUpdate TIMESTAMP NOT NULL
+	        );
+	    """;
+
 
 
   // Set up DB tables etc.
   private void setup(){
     try (var stmt = conn.createStatement()){
 
-      stmt.execute(CREATE_TABLE_STATIONSVERWALTUNG);
-      stmt.execute(CREATE_TABLE_MESSAGES);
- 
-    } catch (SQLException e){
-      throw new RuntimeException(e);
+    	stmt.execute(CREATE_TABLE_WARDS);
+        stmt.execute(CREATE_TABLE_ROOMS);
+        stmt.execute(CREATE_TABLE_BEDS);
+        stmt.execute(CREATE_TABLE_STAFF);
+    } catch (SQLException e) {
+    	throw new RuntimeException(e);
     }
   }
 
-/*
-  @SafeVarargs
-  private static String csv(String... values){
-    return
-      Stream.of(values)
-        .filter(s -> !s.isBlank())
-        .reduce("", (s,t) -> s + "," + t);
+  private static String insertSQL(Ward ward) {
+	  return INSERT_INTO("wards")
+              .VALUE("id", ward.id().value())
+              .VALUE("name", ward.name())
+              .VALUE("lastUpdate", ward.lastUpdate())
+              .toString();
+  }
+  
+  private static String updateSQL(Ward ward) {
+      return UPDATE("wards")
+              .WHERE("id", ward.id().value())
+              .SET("name", ward.name())
+              .SET("lastUpdate", ward.lastUpdate())
+              .toString();
   }
 
 
-  private static String quoted(String s){
-    return String.format("'%s'",s);
-  }
-
-  private static String sqlValue(Object obj){
-
-    return switch(obj){
-//      case Optional<?> opt  -> opt.map(t -> sqlValue(t)).orElse(""); 
-      case Id<?> id         -> quoted(id.value());
-      case LocalDate date   -> quoted(Date.valueOf(date).toString());
-      case LocalDateTime dt -> quoted(Timestamp.valueOf(dt).toString());
-      case Instant t        -> quoted(Timestamp.from(t).toString());
-      case Integer n        -> Integer.toString(n);
-      case Long n           -> Long.toString(n);
-      case Double n         -> Double.toString(n);
-      default               -> quoted(obj.toString());
-    };
-
-  }
-
-
-  private static String insertSQL(TeleConsultation tc){ 
-
-    return "INSERT INTO teleconsultations(" +
-      csv(
-        "id",
-        "patient",
-        "doctor",
-        "status",
-        "start_ts",
-        tc.period().end().map(e -> "end_ts").orElse(""),
-        "lastUpdate"
-      ) +
-     ") VALUES (" +
-      csv(
-        sqlValue(tc.id()),
-        sqlValue(tc.patient().id().value()),
-        sqlValue(tc.doctor().id().value()),
-        sqlValue(tc.status()),
-        sqlValue(tc.period().start()),
-        tc.period().end().map(d -> sqlValue(d)).orElse(""), 
-        sqlValue(tc.lastUpdate())
-      ) +
-      ");";
-
-  }
-
-  private static String updateSQL(TeleConsultation tc){ 
-
-    return "UPDATE teleconsultations SET" +
-      csv(
-        "status = " + sqlValue(tc.status()),
-        "start_ts = " + sqlValue(tc.period().start()),
-        tc.period().end().map(e -> "end_ts = " + sqlValue(e)).orElse(""),
-        "lastUpdate = " + sqlValue(tc.lastUpdate()) 
-      ) +
-      " WHERE id = " + sqlValue(tc.id()) + ";";
-
-  }
-*/
-
-  private static String insertSQL(TeleConsultation tc){
-
-    var	insert =
-      INSERT_INTO("stationsverwaltung")
-        .VALUE("id",tc.id().value())
-        .VALUE("patient",tc.patient().id().value())
-        .VALUE("doctor",tc.doctor().id().value())
-        .VALUE("status",tc.status())
-        .VALUE("start_ts",tc.period().start())
-        .VALUE("lastUpdate",tc.lastUpdate());
-
-     tc.period().end().ifPresent(
-       end -> insert.VALUE("end_ts",end)
-     );
-
-     return insert.toString();	
-  }
-
-  private static String updateSQL(TeleConsultation tc){
-
-    var update =
-      UPDATE("teleconsultations")
-        .WHERE("id",tc.id().value())
-        .SET("status",tc.status())
-        .SET("start_ts",tc.period().start())
-        .SET("lastUpdate",tc.lastUpdate());
-
-    tc.period().end().ifPresent(
-      end -> update.SET("end_ts",end)
-    );
-     
-    return update.toString();
-  }
-
-
-  private static TeleConsultation readTeleConsultation(ResultSet rs) throws SQLException {
-
-    return new TeleConsultation(
-      new Id<>(rs.getString("id")),
-      Reference.to(rs.getString("patient")),
-      Reference.to(rs.getString("doctor")),
-      TeleConsultation.Status.valueOf(rs.getString("status")),
-      new Period<>(
-        rs.getTimestamp("start_ts").toLocalDateTime(),
-        Optional.ofNullable(rs.getTimestamp("end_ts")).map(Timestamp::toLocalDateTime)
-      ), 
-      rs.getTimestamp("lastUpdate").toInstant()
-    );
-
-  }
-
-  private static Message readMessage(ResultSet rs) throws SQLException {
-
-    return new Message(
-      new Id<>(rs.getString("id")),
-      Reference.to(rs.getString("teleconsultation")),
-      Reference.to(rs.getString("author")),
-      rs.getTimestamp("posted_at").toLocalDateTime(),
-      rs.getString("text"),
-      Optional.ofNullable(rs.getString("attachment")).map(DECODER::decode),
-      rs.getTimestamp("lastUpdate").toInstant()
-    );
-
-  }
-
-
-  @Override
-  public Id<TeleConsultation> teleConsultationId(){ 
-    return new Id<>(randomUUID().toString());
-  }
-
-
-  @Override
-  public void save(TeleConsultation tc) throws Exception {
-
-    try (
-      var stmt = conn.createStatement()
-    ){
-
-      var sql =
-        getTeleConsultation(tc.id()).isPresent() ?
-          updateSQL(tc) :
-          insertSQL(tc);
-
-      stmt.executeUpdate(sql);
-
-    } catch (SQLException e){
-      throw new RuntimeException(e);
-    }
-
-  }
-
-
-  @Override
-  public Optional<TeleConsultation> getTeleConsultation(Id<TeleConsultation> id){
-
-    var sql =
-      SELECT("*")
-        .FROM("teleconsultations")
-	.WHERE("id",id.value());
-
-    try (
-      var result =
-        conn.createStatement().executeQuery(sql.toString())
-    ){
-      return
-        result.next() ?
-          Optional.of(readTeleConsultation(result)) :
-          Optional.empty();
-
-    } catch (SQLException e){
-      throw new RuntimeException(e);
-    }
-
-  }
-
-  @Override
-  public List<TeleConsultation> get(TeleConsultation.Filter filter){
-
-    var query =
-      SELECT("*").FROM("teleconsultations");
-
-    filter.patient().ifPresent(
-      ref -> query.WHERE("patient",ref.id().value())
-    );
-
-    filter.doctor().ifPresent(
-      ref -> query.WHERE("doctor",ref.id().value())
-    );
-
-    filter.status().ifPresent(
-      set -> query.WHERE("status",IN,set)
-    );
-
-    try (
-      var resultSet =
-        conn.createStatement().executeQuery(query.toString())
-    ){
-      var tcs = new ArrayList<TeleConsultation>();
-
-      while (resultSet.next()){
-        tcs.add(readTeleConsultation(resultSet));
-      }
-
-      return tcs;
-
-    } catch (SQLException e){
-      throw new RuntimeException(e);
-    }
-
-  }
-
-
-
-
-  @Override
-  public Id<Message> messageId(){
-
-    return new Id<>(randomUUID().toString());
-  }
-
-
-  private static String insertSQL(Message msg){
-
-    var insert =
-      INSERT_INTO("messages")
-        .VALUE("id",msg.id().value())
-        .VALUE("teleConsultation",msg.teleConsultation().id().value())
-        .VALUE("author",msg.author().id().value())
-        .VALUE("posted_at",msg.postedAt())
-        .VALUE("text",msg.text())
-        .VALUE("lastUpdate",msg.lastUpdate());
-
-    msg.attachment().ifPresent(
-      bytes -> insert.VALUE("attachment",ENCODER.encodeToString(bytes))
-    );
-
-    return insert.toString();
-
-  }
-
-  private static String updateSQL(Message msg){
-    var update =
-      UPDATE("messages")
-        .SET("text",msg.text())
-        .SET("lastUpdate",msg.lastUpdate());
-
-    msg.attachment().ifPresent(
-      bytes -> update.SET("attachment",ENCODER.encodeToString(bytes))
-    );
-
-    return update.WHERE("id",msg.id()).toString();
-  }
-
-
-
-  @Override
-  public void save(Message msg) throws Exception {
-
-    try (
-      var stmt = conn.createStatement()
-    ){
-
-      var sql =
-        getMessage(msg.id()).isPresent() ?
-          updateSQL(msg) :
-          insertSQL(msg);
-
-      stmt.executeUpdate(sql);
-
-    } catch (SQLException e){
-      throw new RuntimeException(e);
-    }
-
-  }
-
-  @Override
-  public List<Message> get(Message.Filter filter){
-
-    var query =
-      SELECT("*")
-        .FROM("messages")
-        .WHERE("teleConsultation",filter.teleConsultation().id().value())
-        .WHERE(COLUMN("posted_at").greaterThanOrEqual(filter.period().start()))
-	.ORDER_BY("posted_at");
-
-    filter.period().end().ifPresent(
-      end -> query.WHERE(COLUMN("posted_at").lessThanOrEqual(end))
-    );
-
-    try (
-      var resultSet =
-        conn.createStatement().executeQuery(query.toString())
-    ){
-
-      var tcs = new ArrayList<Message>();
-
-      while (resultSet.next()){
-        tcs.add(readMessage(resultSet));
-      }
-
-      return tcs;
-
-    } catch (SQLException e){
-      throw new RuntimeException(e);
-    }
-
-  }
-
-  @Override
-  public Optional<Message> getMessage(Id<Message> id){
-
-    try (
-      var result =
-        conn.createStatement().executeQuery(
-          SELECT("*")
-            .FROM("messages")
-            .WHERE("id",id.value())
-            .toString()
-        )
-    ){
-      return
-        result.next() ?
-          Optional.of(readMessage(result)) :
-          Optional.empty();
-
-    } catch (SQLException e){
-      throw new RuntimeException(e);
-    }
-
-  }
-
-  @Override
-  public void delete(Id<Message> id){
-
-    try (
-      var stmt = conn.createStatement()
-    ){
-      stmt.executeUpdate(
-        DELETE_FROM("messages")
-          .WHERE("id",id)
-          .toString()
+  private static Ward readWard(ResultSet rs) throws SQLException {
+      return new Ward(
+              new Id<>(rs.getString("id")),
+              rs.getString("name"),
+              rs.getTimestamp("lastUpdate").toInstant()
       );
-    } catch (SQLException e){
-      throw new RuntimeException(e);
-    }
-
   }
 
 
-@Override
-public Id<Ward> WardID() {
-	// TODO Auto-generated method stub
-	return null;
-}
+  @Override
+  public Id<Ward> wardId() {
+      return new Id<>(UUID.randomUUID().toString());
+  }
 
+  @Override
+  public void save(Ward ward) throws Exception {
+      try (var stmt = conn.createStatement()) {
+          var sql = getWard(ward.id()).isPresent() ? updateSQL(ward) : insertSQL(ward);
+          stmt.executeUpdate(sql);
+      } catch (SQLException e) {
+          throw new RuntimeException(e);
+      }
+  }
 
-@Override
-public void save(Ward ward) throws Exception {
-	// TODO Auto-generated method stub
-	
-}
+  private Optional<Ward> getWard(Id<Ward> id) {
+      try (var stmt = conn.createStatement();
+           var rs = stmt.executeQuery("SELECT * FROM wards WHERE id = '" + id.value() + "'")) {
+          if (rs.next()) {
+              return Optional.of(readWard(rs));
+          }
+      } catch (SQLException e) {
+          throw new RuntimeException(e);
+      }
+      return Optional.empty();
+  }
+  
+//Room methods
+  private static String insertSQL(Room room) {
+      return INSERT_INTO("rooms")
+              .VALUE("roomNr", room.roomNr())
+              .VALUE("roomName", room.roomName())
+              .VALUE("ward", room.ward().id().value())
+              .VALUE("lastUpdate", room.lastUpdate())
+              .toString();
+  }
 
+  private static String updateSQL(Room room) {
+      return UPDATE("rooms")
+              .WHERE("roomNr", room.roomNr())
+              .SET("roomName", room.roomName())
+              .SET("ward", room.ward().id().value())
+              .SET("lastUpdate", room.lastUpdate())
+              .toString();
+  }
 
-@Override
-public List<Ward> get(Filter filter) {
-	// TODO Auto-generated method stub
-	return null;
-}
+  private static Room readRoom(ResultSet rs) throws SQLException {
+      return new Room(
+              rs.getInt("roomNr"),
+              rs.getString("roomName"),
+              Reference.to(rs.getString("ward")),
+              rs.getTimestamp("lastUpdate").toInstant()
+      );
+  }
 
+  @Override
+  public int roomNr() {
+      // This method generates a new room number, you might want to change this to a different logic.
+      return new Random().nextInt(1000);
+  }
 
-@Override
-public List<de.db2.wardmanagement.backend.entity.Room> get(de.db2.wardmanagement.backend.entity.Room.Filter filter) {
-	// TODO Auto-generated method stub
-	return null;
-}
+  @Override
+  public void save(Room room) throws Exception {
+      try (var stmt = conn.createStatement()) {
+          var sql = getRoom(room.roomNr()).isPresent() ? updateSQL(room) : insertSQL(room);
+          stmt.executeUpdate(sql);
+      } catch (SQLException e) {
+          throw new RuntimeException(e);
+      }
+  }
 
+  private Optional<Room> getRoom(int roomNr) {
+      try (var stmt = conn.createStatement();
+           var rs = stmt.executeQuery("SELECT * FROM rooms WHERE roomNr = " + roomNr)) {
+          if (rs.next()) {
+              return Optional.of(readRoom(rs));
+          }
+      } catch (SQLException e) {
+          throw new RuntimeException(e);
+      }
+      return Optional.empty();
+  }
 
-@Override
-public List<de.db2.wardmanagement.backend.entity.Room> get(de.db2.wardmanagement.backend.entity.Bed.Filter filter) {
-	// TODO Auto-generated method stub
-	return null;
-}
+  // Bed methods
+  private static String insertSQL(Bed bed) {
+      return INSERT_INTO("beds")
+              .VALUE("bedID", bed.bedID().value())
+              .VALUE("patient", bed.patient().map(p -> p.id().value()).orElse(null))
+              .VALUE("roomNr", bed.roomNr())
+              .VALUE("lastUpdate", bed.lastUpdate())
+              .toString();
+  }
 
+  private static String updateSQL(Bed bed) {
+      return UPDATE("beds")
+              .WHERE("bedID", bed.bedID().value())
+              .SET("patient", bed.patient().map(p -> p.id().value()).orElse(null))
+              .SET("roomNr", bed.roomNr())
+              .SET("lastUpdate", bed.lastUpdate())
+              .toString();
+  }
 
-@Override
-public List<de.db2.wardmanagement.backend.entity.Staff> get(de.db2.wardmanagement.backend.entity.Staff.Filter filter) {
-	// TODO Auto-generated method stub
-	return null;
-}
+  private static Bed readBed(ResultSet rs) throws SQLException {
+      return new Bed(
+              new Id<>(rs.getString("bedID")),
+              rs.getString("patient") != null ? Optional.of(Reference.to(rs.getString("patient"))) : Optional.empty(),
+              rs.getInt("roomNr"),
+              rs.getTimestamp("lastUpdate").toInstant()
+      );
+  }
 
+  @Override
+  public Id<Bed> bedId() {
+      return new Id<>(UUID.randomUUID().toString());
+  }
 
-@Override
-public Optional<Ward> getWard(Id<Ward> id) {
-	// TODO Auto-generated method stub
-	return Optional.empty();
-}
+  @Override
+  public void save(Bed bed) throws Exception {
+      try (var stmt = conn.createStatement()) {
+          var sql = getBed(bed.bedID()).isPresent() ? updateSQL(bed) : insertSQL(bed);
+          stmt.executeUpdate(sql);
+      } catch (SQLException e) {
+          throw new RuntimeException(e);
+      }
+  }
 
+  private Optional<Bed> getBed(Id<Bed> id) {
+      try (var stmt = conn.createStatement();
+           var rs = stmt.executeQuery("SELECT * FROM beds WHERE bedID = '" + id.value() + "'")) {
+          if (rs.next()) {
+              return Optional.of(readBed(rs));
+          }
+      } catch (SQLException e) {
+          throw new RuntimeException(e);
+      }
+      return Optional.empty();
+  }
 
-@Override
-public Id<de.db2.wardmanagement.backend.entity.Room> RoomID() {
-	// TODO Auto-generated method stub
-	return null;
-}
+  // Staff methods
+  private static String insertSQL(Staff staff) {
+      return INSERT_INTO("staff")
+              .VALUE("staffID", staff.staffID().value())
+              .VALUE("preName", staff.preName())
+              .VALUE("name", staff.name())
+              .VALUE("birthday", staff.birthday())
+              .VALUE("function", staff.function())
+              .VALUE("lastUpdate", staff.lastUpdate())
+              .toString();
+  }
 
+  private static String updateSQL(Staff staff) {
+      return UPDATE("staff")
+              .WHERE("staffID", staff.staffID().value())
+              .SET("preName", staff.preName())
+              .SET("name", staff.name())
+              .SET("birthday", staff.birthday())
+              .SET("function", staff.function())
+              .SET("lastUpdate", staff.lastUpdate())
+              .toString();
+  }
 
-@Override
-public void save(de.db2.wardmanagement.backend.entity.Room room) throws Exception {
-	// TODO Auto-generated method stub
-	
-}
+  private static Staff readStaff(ResultSet rs) throws SQLException {
+      return new Staff(
+              new Id<>(rs.getString("staffID")),
+              rs.getString("preName"),
+              rs.getString("name"),
+              rs.getDate("birthday").toLocalDate(),
+              rs.getString("function"),
+              rs.getTimestamp("lastUpdate").toInstant()
+      );
+  }
 
+  @Override
+  public Id<Staff> staffId() {
+      return new Id<>(UUID.randomUUID().toString());
+  }
 
-@Override
-public Optional<de.db2.wardmanagement.backend.entity.Room> Room(Id<de.db2.wardmanagement.backend.entity.Room> id) {
-	// TODO Auto-generated method stub
-	return Optional.empty();
-}
+  @Override
+  public void save(Staff staff) throws Exception {
+      try (var stmt = conn.createStatement()) {
+          var sql = getStaff(staff.staffID()).isPresent() ? updateSQL(staff) : insertSQL(staff);
+          stmt.executeUpdate(sql);
+      } catch (SQLException e) {
+          throw new RuntimeException(e);
+      }
+  }
 
-
-@Override
-public Id<de.db2.wardmanagement.backend.entity.Bed> BedID() {
-	// TODO Auto-generated method stub
-	return null;
-}
-
-
-@Override
-public void save(de.db2.wardmanagement.backend.entity.Bed bed) throws Exception {
-	// TODO Auto-generated method stub
-	
-}
-
-
-@Override
-public Optional<de.db2.wardmanagement.backend.entity.Bed> Bed(Id<de.db2.wardmanagement.backend.entity.Bed> id) {
-	// TODO Auto-generated method stub
-	return Optional.empty();
-}
-
-
-@Override
-public Id<de.db2.wardmanagement.backend.entity.Staff> StaffID() {
-	// TODO Auto-generated method stub
-	return null;
-}
-
-
-@Override
-public void save(de.db2.wardmanagement.backend.entity.Staff staff) throws Exception {
-	// TODO Auto-generated method stub
-	
-}
-
-
-@Override
-public Optional<de.db2.wardmanagement.backend.entity.Staff> Staff(Id<de.db2.wardmanagement.backend.entity.Staff> id) {
-	// TODO Auto-generated method stub
-	return Optional.empty();
-}
-
+  private Optional<Staff> getStaff(Id<Staff> id) {
+      try (var stmt = conn.createStatement();
+           var rs = stmt.executeQuery("SELECT * FROM staff WHERE staffID = '" + id.value() + "'")) {
+          if (rs.next()) {
+              return Optional.of(readStaff(rs));
+          }
+      } catch (SQLException e) {
+          throw new RuntimeException(e);
+      }
+      return Optional.empty();
+  }
 }
