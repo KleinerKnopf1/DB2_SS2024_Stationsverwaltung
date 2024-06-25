@@ -34,21 +34,43 @@ public class Wardmanagementservice implements IWardmanagementservice {
   }
 
 @Override
-public Ward process(Command cmd) throws Exception {
-	// TODO Auto-generated method stub
-	return null;
+public Ward process(Command cmd) {
+	return switch(cmd){
+
+    case Ward.Create crwd -> { 
+
+    var wd = new Ward(
+    		repo.WardID(),
+    	    post.author(),
+    	    Instant.now()
+    	            );
+      
+        repo.save(wd);
+      
+        yield wd;
+
+    }
+
+    case Ward.Delete delete -> { 
+
+        var deleteWard =
+          repo.getWard(delete.id());
+        
+        yield deleteWard;
+      }
+  };
 }
 
 @Override
-public List<Ward> getWard(Filter filter) {
-	// TODO Auto-generated method stub
-	return null;
+public List<Ward> getWards(Filter filter) {
+	
+	return repo.get(filter);
 }
 
 @Override
 public Optional<Ward> getWard(Id<Ward> id) {
-	// TODO Auto-generated method stub
-	return Optional.empty();
+	
+	return repo.getWard(id);
 }
 
 @Override

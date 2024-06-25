@@ -54,7 +54,7 @@ public record Ward
 
 	  public static interface Operations
 	  {
-	    Ward process(Command cmd) throws Exception;
+	    Ward process(Command cmd) //throws Exception;
 
 	    List<Ward> getWard(Filter filter);
 
