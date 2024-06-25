@@ -28,7 +28,7 @@ public interface Repository {
 	 
 	 Id<Bed> BedID();
 	  void save(Bed bed) throws Exception;
-	  List<Room> get(Bed.Filter filter);
+	  List<de.db2.wardmanagement.backend.entity.Bed> get(Bed.Filter filter);
 	  Optional<Bed> Bed(Id<Bed> id);
 	  
 	  
@@ -38,7 +38,7 @@ public interface Repository {
 	  List<Staff> get(Staff.Filter filter);
 	  Optional<Staff> Staff(Id<Staff> id);
 	 
-	  //Was macht das? Ab hier noch Code Anpassen bisher nur copy paste von clins Repository class
+	  
 	  public static interface Provider
 	  { 
 	    Repository instance();

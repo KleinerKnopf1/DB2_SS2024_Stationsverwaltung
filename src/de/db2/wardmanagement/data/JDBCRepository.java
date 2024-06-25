@@ -340,7 +340,7 @@ public class JDBCRepository implements Repository
   @Override
   public void save(Staff staff) throws Exception {
       try (var stmt = conn.createStatement()) {
-          var sql = getStaff(staff.staffID()).isPresent() ? updateSQL(staff) : insertSQL(staff);
+          var sql = getStaff(staff.StaffID()).isPresent() ? updateSQL(staff) : insertSQL(staff);
           stmt.executeUpdate(sql);
       } catch (SQLException e) {
           throw new RuntimeException(e);

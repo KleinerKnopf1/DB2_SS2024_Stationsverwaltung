@@ -1,8 +1,10 @@
 package de.db2.wardmanagement.data;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import de.db2.wardmanagement.backend.entity.*;
 import de.db2.wardmanagement.backend.entity.Bed;
 import de.db2.wardmanagement.backend.entity.Room;
 import de.db2.wardmanagement.backend.entity.Ward;
@@ -34,14 +36,13 @@ public class Wardmanagementservice implements IWardmanagementservice {
   }
 
 @Override
-public Ward process(Command cmd) {
+public Ward process(Ward.Command cmd) {
 	return switch(cmd){
 
     case Ward.Create crwd -> { 
 
     var wd = new Ward(
     		repo.WardID(),
-    	    post.author(),
     	    Instant.now()
     	            );
       
@@ -58,11 +59,24 @@ public Ward process(Command cmd) {
         
         yield deleteWard;
       }
+    
+    case Ward.Update update -> { 
+
+        var updateWard  =
+        		repo.getWard(update.id()
+        		.updateWith(
+                        update.name(),
+                        update.staff()
+        		);
+        		
+        
+      }
+    
   };
 }
 
 @Override
-public List<Ward> getWards(Filter filter) {
+public List<Ward> getWard(Ward.Filter filter) {
 	
 	return repo.get(filter);
 }
@@ -74,44 +88,38 @@ public Optional<Ward> getWard(Id<Ward> id) {
 }
 
 @Override
-public Room process(de.db2.wardmanagement.backend.entity.Room.Command cmd) throws Exception {
+public Room process(Room.Command cmd) throws Exception {
 	// TODO Auto-generated method stub
 	return null;
 }
 
 @Override
-public List<Room> getRooms(de.db2.wardmanagement.backend.entity.Room.Filter filter) {
-	// TODO Auto-generated method stub
-	return null;
+public List<Room> getRooms(Room.Filter filter) {
+	
+	return repo.get(filter);
 }
 
 @Override
 public Optional<Room> getRoom(Id<Room> id) {
-	// TODO Auto-generated method stub
-	return Optional.empty();
+	
+	return repo.Room(id);
 }
 
 @Override
-public Bed process(de.db2.wardmanagement.backend.entity.Bed.Command cmd) throws Exception {
+public Bed process(Bed.Command cmd) throws Exception {
 	// TODO Auto-generated method stub
 	return null;
 }
 
 @Override
-public List<Bed> getBeds(de.db2.wardmanagement.backend.entity.Bed.Filter filter) {
-	// TODO Auto-generated method stub
-	return null;
+public List<Bed> getBeds(Bed.Filter filter) {
+	return repo.get(filter);
 }
 
 @Override
 public Optional<Bed> getBed(Id<Bed> id) {
-	// TODO Auto-generated method stub
-	return Optional.empty();
+	
+	return repo.Bed(id);
 }  
-
-	
-	
-	
-	
 
 }
