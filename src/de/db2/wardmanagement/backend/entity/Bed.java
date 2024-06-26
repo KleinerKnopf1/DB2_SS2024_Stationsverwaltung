@@ -9,7 +9,7 @@ import de.db2.wardmanagement.backend.type.Reference;
 
 public  record Bed (
 		Id<Bed> id,
-		String name,
+		Optional<Reference<Patient>> patient,
 		Reference<Room> room
 		)
 

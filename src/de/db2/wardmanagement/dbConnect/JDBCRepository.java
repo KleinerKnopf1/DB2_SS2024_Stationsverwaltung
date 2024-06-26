@@ -138,15 +138,14 @@ public class JDBCRepository implements Repository
 	  return INSERT_INTO("wards")
               .VALUE("id", ward.id().value())
               .VALUE("name", ward.name())
-              .VALUE("lastUpdate", ward.lastUpdate())
+              
               .toString();
   }
   
   private static String updateSQL(Ward ward) {
       return UPDATE("wards")
               .WHERE("id", ward.id().value())
-              .SET("name", ward.name())
-              .SET("lastUpdate", ward.lastUpdate())
+              .SET("name", ward.name())      
               .toString();
   }
 
@@ -190,19 +189,17 @@ public class JDBCRepository implements Repository
 //Room methods
   private static String insertSQL(Room room) {
       return INSERT_INTO("rooms")
-              .VALUE("roomNr", room.roomNr())
+              .VALUE("roomNr", room.id())
               .VALUE("roomName", room.roomName())
               .VALUE("ward", room.ward().id().value())
-              .VALUE("lastUpdate", room.lastUpdate())
               .toString();
   }
 
   private static String updateSQL(Room room) {
       return UPDATE("rooms")
-              .WHERE("roomNr", room.roomNr())
+              .WHERE("roomNr", room.id())
               .SET("roomName", room.roomName())
               .SET("ward", room.ward().id().value())
-              .SET("lastUpdate", room.lastUpdate())
               .toString();
   }
 
@@ -216,24 +213,18 @@ public class JDBCRepository implements Repository
   }
 
   @Override
-  public int roomNr() {
-      // This method generates a new room number, you might want to change this to a different logic.
-      return new Random().nextInt(1000);
-  }
-
-  @Override
   public void save(Room room) throws Exception {
       try (var stmt = conn.createStatement()) {
-          var sql = getRoom(room.roomNr()).isPresent() ? updateSQL(room) : insertSQL(room);
+          var sql = getRoom(room.id()).isPresent() ? updateSQL(room) : insertSQL(room);
           stmt.executeUpdate(sql);
       } catch (SQLException e) {
           throw new RuntimeException(e);
       }
   }
 
-  private Optional<Room> getRoom(int roomNr) {
+  private Optional<Room> getRoom(Id<de.db2.wardmanagement.backend.entity.Room> id) {
       try (var stmt = conn.createStatement();
-           var rs = stmt.executeQuery("SELECT * FROM rooms WHERE roomNr = " + roomNr)) {
+           var rs = stmt.executeQuery("SELECT * FROM rooms WHERE roomNr = " + id)) {
           if (rs.next()) {
               return Optional.of(readRoom(rs));
           }
@@ -246,19 +237,17 @@ public class JDBCRepository implements Repository
   // Bed methods
   private static String insertSQL(Bed bed) {
       return INSERT_INTO("beds")
-              .VALUE("bedID", bed.bedID().value())
+              .VALUE("bedID", bed.id().value())
               .VALUE("patient", bed.patient().map(p -> p.id().value()).orElse(null))
-              .VALUE("roomNr", bed.roomNr())
-              .VALUE("lastUpdate", bed.lastUpdate())
+              .VALUE("roomNr", bed.room())
               .toString();
   }
 
   private static String updateSQL(Bed bed) {
       return UPDATE("beds")
-              .WHERE("bedID", bed.bedID().value())
+              .WHERE("bedID", bed.id().value())
               .SET("patient", bed.patient().map(p -> p.id().value()).orElse(null))
-              .SET("roomNr", bed.roomNr())
-              .SET("lastUpdate", bed.lastUpdate())
+              .SET("roomNr", bed.room())
               .toString();
   }
 
@@ -272,14 +261,14 @@ public class JDBCRepository implements Repository
   }
 
   @Override
-  public Id<Bed> bedId() {
+  public Id<Bed> id() {
       return new Id<>(UUID.randomUUID().toString());
   }
 
   @Override
   public void save(Bed bed) throws Exception {
       try (var stmt = conn.createStatement()) {
-          var sql = getBed(bed.bedID()).isPresent() ? updateSQL(bed) : insertSQL(bed);
+          var sql = getBed(bed.id()).isPresent() ? updateSQL(bed) : insertSQL(bed);
           stmt.executeUpdate(sql);
       } catch (SQLException e) {
           throw new RuntimeException(e);
@@ -301,23 +290,23 @@ public class JDBCRepository implements Repository
   // Staff methods
   private static String insertSQL(Staff staff) {
       return INSERT_INTO("staff")
-              .VALUE("staffID", staff.staffID().value())
-              .VALUE("preName", staff.preName())
+              .VALUE("staffID", staff.id().value())
+              .VALUE("preName", staff.prename())
               .VALUE("name", staff.name())
               .VALUE("birthday", staff.birthday())
               .VALUE("function", staff.function())
-              .VALUE("lastUpdate", staff.lastUpdate())
+              .VALUE("ward", staff.ward())
               .toString();
   }
 
   private static String updateSQL(Staff staff) {
       return UPDATE("staff")
-              .WHERE("staffID", staff.staffID().value())
-              .SET("preName", staff.preName())
+              .WHERE("staffID", staff.id().value())
+              .SET("preName", staff.prename())
               .SET("name", staff.name())
               .SET("birthday", staff.birthday())
               .SET("function", staff.function())
-              .SET("lastUpdate", staff.lastUpdate())
+              .SET("ward", staff.ward())
               .toString();
   }
 
@@ -340,7 +329,7 @@ public class JDBCRepository implements Repository
   @Override
   public void save(Staff staff) throws Exception {
       try (var stmt = conn.createStatement()) {
-          var sql = getStaff(staff.StaffID()).isPresent() ? updateSQL(staff) : insertSQL(staff);
+          var sql = getStaff(staff.id()).isPresent() ? updateSQL(staff) : insertSQL(staff);
           stmt.executeUpdate(sql);
       } catch (SQLException e) {
           throw new RuntimeException(e);
@@ -364,13 +353,6 @@ public class JDBCRepository implements Repository
 public Id<Ward> WardID() {
 	// TODO Auto-generated method stub
 	return null;
-}
-
-
-@Override
-public Optional<Ward> getWard(Id<Ward> id) {
-	// TODO Auto-generated method stub
-	return Optional.empty();
 }
 
 
