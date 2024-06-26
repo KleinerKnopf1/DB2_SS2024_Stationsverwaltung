@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.toList;
 
 public abstract class sql {
 
-	  private  SQL(){}
+	  private  sql(){}
 
 
 	  public static sealed abstract class Builder permits SelectBuilder, InsertBuilder, UpdateBuilder, DeleteBuilder
