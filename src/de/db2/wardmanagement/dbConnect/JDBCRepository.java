@@ -21,6 +21,7 @@ import java.util.stream.Stream;
 import static java.util.stream.Collectors.toList;
 import static java.util.Map.entry;
 import static java.util.UUID.randomUUID;
+import static de.db2.wardmanagement.dbConnect.sql.*;
 
 import de.db2.wardmanagement.backend.type.Id;
 import de.db2.wardmanagement.backend.type.Reference;
@@ -81,8 +82,6 @@ public class JDBCRepository implements Repository
   }
   
 
-  // NOTE: 
-  // Column renamed explicitly "end_ts", because "end" seems to be a reserved keyword in SQL and leads to SQL syntax errors
   private static final String CREATE_TABLE_WARDS = """
 	        CREATE TABLE IF NOT EXISTS wards (
 	            id UUID PRIMARY KEY,
