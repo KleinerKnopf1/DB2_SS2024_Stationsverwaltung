@@ -109,7 +109,7 @@ public abstract class sql {
 	      return new Criterion(
 	        column,
 		Operator.IN,
-		values.stream().map(SQL::valueOf).reduce("(",(s,t) -> s + ",") + ")"
+		values.stream().map(sql::valueOf).reduce("(",(s,t) -> s + ",") + ")"
 	      );
 	    }
 
