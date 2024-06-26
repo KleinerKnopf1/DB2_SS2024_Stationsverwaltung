@@ -9,7 +9,7 @@ import de.db2.wardmanagement.backend.type.Reference;
 public  record Room (
 		Id<Room> id,
 		String roomName,
-		Reference<Room> Room
+		Reference<Ward> ward
 		)
 
 {

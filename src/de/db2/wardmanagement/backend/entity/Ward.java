@@ -8,8 +8,7 @@ import de.db2.wardmanagement.backend.type.Reference;
 public record Ward
 	(
 	  Id<Ward> id,
-	  String name,
-	  Reference<Staff> staff
+	  String name
 	
 	)
 {

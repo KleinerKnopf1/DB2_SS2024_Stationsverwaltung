@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import de.db2.wardmanagement.backend.type.Id;
+import de.db2.wardmanagement.backend.type.Reference;
 
 
 public record Staff
@@ -12,7 +13,8 @@ public record Staff
   String prename,
   String name,
   LocalDateTime birthday,
-  String function
+  String function,
+  Reference<Ward> ward
 )
 {
 	
