@@ -1,6 +1,6 @@
 package de.db2.wardmanagement.backend.entity;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Optional;
 
 import de.db2.wardmanagement.backend.type.Id;
@@ -12,7 +12,7 @@ public record Staff
   Id<Staff> id,
   String prename,
   String name,
-  LocalDateTime birthday,
+  LocalDate birthday,
   String function,
   Reference<Ward> ward
 )
@@ -22,7 +22,7 @@ public record Staff
 	  (
 	    Optional<String> name,
 	    Optional<String> prename,
-	    Optional<LocalDateTime> birthday,
+	    Optional<LocalDate> birthday,
 	    Optional<String> function
 	    
 	  )
