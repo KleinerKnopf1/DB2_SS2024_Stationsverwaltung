@@ -1,4 +1,4 @@
-package de.db2.wardmanagement.data;
+package de.db2.wardmanagement.dbConnect;
 
 
 import java.sql.Connection;
@@ -25,6 +25,7 @@ import static java.util.UUID.randomUUID;
 import de.db2.wardmanagement.backend.type.Id;
 import de.db2.wardmanagement.backend.type.Reference;
 import de.db2.wardmanagement.data.Repository;
+import de.db2.wardmanagement.data.Repository.Provider;
 import de.db2.wardmanagement.backend.entity.Ward;
 import de.db2.wardmanagement.backend.entity.Ward.Filter;
 import de.db2.wardmanagement.backend.entity.Room;
@@ -358,4 +359,88 @@ public class JDBCRepository implements Repository
       }
       return Optional.empty();
   }
+
+
+@Override
+public Id<Ward> WardID() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+
+@Override
+public Optional<Ward> getWard(Id<Ward> id) {
+	// TODO Auto-generated method stub
+	return Optional.empty();
+}
+
+
+@Override
+public Id<de.db2.wardmanagement.backend.entity.Room> RoomID() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+
+@Override
+public Optional<de.db2.wardmanagement.backend.entity.Room> Room(Id<de.db2.wardmanagement.backend.entity.Room> id) {
+	// TODO Auto-generated method stub
+	return Optional.empty();
+}
+
+
+@Override
+public Id<de.db2.wardmanagement.backend.entity.Bed> BedID() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+
+@Override
+public Optional<de.db2.wardmanagement.backend.entity.Bed> Bed(Id<de.db2.wardmanagement.backend.entity.Bed> id) {
+	// TODO Auto-generated method stub
+	return Optional.empty();
+}
+
+
+@Override
+public Id<de.db2.wardmanagement.backend.entity.Staff> StaffID() {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+
+@Override
+public Optional<de.db2.wardmanagement.backend.entity.Staff> Staff(Id<de.db2.wardmanagement.backend.entity.Staff> id) {
+	// TODO Auto-generated method stub
+	return Optional.empty();
+}
+
+
+@Override
+public List<Ward> get(Filter arg0) {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+
+@Override
+public List<de.db2.wardmanagement.backend.entity.Room> get(de.db2.wardmanagement.backend.entity.Room.Filter arg0) {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+
+@Override
+public List<de.db2.wardmanagement.backend.entity.Bed> get(de.db2.wardmanagement.backend.entity.Bed.Filter arg0) {
+	// TODO Auto-generated method stub
+	return null;
+}
+
+
+@Override
+public List<de.db2.wardmanagement.backend.entity.Staff> get(de.db2.wardmanagement.backend.entity.Staff.Filter arg0) {
+	// TODO Auto-generated method stub
+	return null;
+}
 }
