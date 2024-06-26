@@ -153,7 +153,8 @@ public abstract class sql {
 	      return this;
 	    }
 
-	    public SelectBuilder WHERE(String col, Operator op, Object value){
+	    @SuppressWarnings("unchecked")
+		public SelectBuilder WHERE(String col, Operator op, Object value){
 	      return switch (op){
 	        case Operator.IN -> { 
 	  	  yield this.WHERE(COLUMN(col).in(Set.class.cast(value)));
