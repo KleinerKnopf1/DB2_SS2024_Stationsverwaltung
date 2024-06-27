@@ -59,17 +59,15 @@ public class JDBCRepository implements Repository {
 	private static final String CREATE_TABLE_WARDS = """
 			    CREATE TABLE IF NOT EXISTS wards (
 			        id UUID PRIMARY KEY,
-			        name VARCHAR(255) NOT NULL,
-			        lastUpdate TIMESTAMP NOT NULL
+			        name VARCHAR(255) NOT NULL
 			    );
 			""";
 
 	private static final String CREATE_TABLE_ROOMS = """
 			    CREATE TABLE IF NOT EXISTS rooms (
-			        roomNr INT PRIMARY KEY,
+			        roomId UUID PRIMARY KEY,
 			        roomName VARCHAR(255) NOT NULL,
-			        ward UUID REFERENCES wards(id),
-			        lastUpdate TIMESTAMP NOT NULL
+			        ward UUID REFERENCES wards(id)
 			    );
 			""";
 
@@ -77,8 +75,7 @@ public class JDBCRepository implements Repository {
 			    CREATE TABLE IF NOT EXISTS beds (
 			        bedID UUID PRIMARY KEY,
 			        patient UUID,
-			        roomNr INT REFERENCES rooms(roomNr),
-			        lastUpdate TIMESTAMP NOT NULL
+			        roomNr INT REFERENCES rooms(roomNr)
 			    );
 			""";
 
@@ -88,8 +85,7 @@ public class JDBCRepository implements Repository {
 			        preName VARCHAR(255),
 			        name VARCHAR(255) NOT NULL,
 			        birthday DATE,
-			        function VARCHAR(255),
-			        lastUpdate TIMESTAMP NOT NULL
+			        function VARCHAR(255)
 			    );
 			""";
 

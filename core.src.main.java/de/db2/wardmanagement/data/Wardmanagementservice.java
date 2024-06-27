@@ -40,7 +40,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 		
 		case Ward.Create crwd -> { 
 			
-			var wd = new Ward(repo.WardID(), crwd.name(),);
+			var wd = new Ward(repo.WardID(), crwd.name());
 			
 			repo.save(wd);
 			
@@ -69,6 +69,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 			yield updateWard;
 		}};
 	}
+}
 
 	@Override
 	public List<Ward> getWard(Ward.Filter filter) {	
