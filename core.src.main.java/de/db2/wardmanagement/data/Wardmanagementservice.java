@@ -38,38 +38,38 @@ public class Wardmanagementservice implements IWardmanagementservice {
 	public Ward process(Ward.Command cmd) throws Exception {
 		return switch(cmd){
 		
-		case Ward.Create crwd -> { 
+			case Ward.Create crwd -> { 
+				
+				var wd = new Ward(repo.WardID(), crwd.name());
+				
+				repo.save(wd);
+				
+				yield wd;
+				
+			}
 			
-			var wd = new Ward(repo.WardID(), crwd.name());
+			case Ward.Delete delete -> {
+				
+				var deleteWard = repo.getWard(delete.id())
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Ward ID"));
+				
+				repo.deleteWard(delete.id());
+				
+				yield deleteWard;
+			}
 			
-			repo.save(wd);
+			case Ward.Update update -> {
+				
+				var updateWard  = repo.getWard(update.id())
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Ward ID"))
+						.updateWith(update.name());
+				
+				repo.save(updateWard);
 			
-			yield wd;
-			
-		}
-		
-		case Ward.Delete delete -> {
-			
-			var deleteWard = repo.getWard(delete.id())
-					.orElseThrow(() -> new IllegalArgumentException("Invalid Ward ID"));
-			
-			repo.deleteWard(delete.id());
-			
-			yield deleteWard;
-		}
-		
-		case Ward.Update update -> {
-			
-			var updateWard  = repo.getWard(update.id())
-					.orElseThrow(() -> new IllegalArgumentException("Invalid Ward ID"))
-					.updateWith(update.name());
-			
-			repo.save(updateWard);
-		
-			yield updateWard;
-		}};
+				yield updateWard;
+			}};
 	}
-}
+
 
 	@Override
 	public List<Ward> getWard(Ward.Filter filter) {	
@@ -85,36 +85,36 @@ public class Wardmanagementservice implements IWardmanagementservice {
 	public Room process(Room.Command cmd) throws Exception {
 		return switch(cmd){
 		
-		case Room.Create crroom -> { 
+			case Room.Create crroom -> { 
+				
+				var rm = new Room(repo.RoomID(), crroom.roomName());
+				
+				repo.save(rm);
+				
+				yield rm;
+				
+			}
 			
-			var rm = new Room(repo.RoomID(), crroom.roomName());
+			case Room.Delete delete -> {
+				
+				var deleteRoom = repo.getRoom(delete.id())
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Room ID"));
+				
+				repo.deleteRoom(delete.id());
+				
+				yield deleteRoom;
+			}
 			
-			repo.save(rm);
+			case Room.Update update -> {
+				
+				var updateRoom  = repo.getRoom(update.id())
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Room ID"))
+						.updateWith(update.roomName(), update.ward());
+				
+				repo.save(updateRoom);
 			
-			yield rm;
-			
-		}
-		
-		case Room.Delete delete -> {
-			
-			var deleteRoom = repo.getRoom(delete.id())
-					.orElseThrow(() -> new IllegalArgumentException("Invalid Room ID"));
-			
-			repo.deleteRoom(delete.id());
-			
-			yield deleteRoom;
-		}
-		
-		case Room.Update update -> {
-			
-			var updateRoom  = repo.getRoom(update.id())
-					.orElseThrow(() -> new IllegalArgumentException("Invalid Room ID"))
-					.updateWith(update.roomName(), update.ward());
-			
-			repo.save(updateRoom);
-		
-			yield updateRoom;
-		}};	
+				yield updateRoom;
+			}};	
 	}
 	
 	@Override
@@ -131,47 +131,47 @@ public class Wardmanagementservice implements IWardmanagementservice {
 	public Bed process(Bed.Command cmd) throws Exception {
 		return switch(cmd){
 		
-		case Bed.Create crbed -> { 
+			case Bed.Create crbed -> {
+				
+				var bed = new Bed(repo.BedID(), crbed.patient, crbed.room());
+				
+				repo.save(bed);
+				
+				yield bed;
+				
+			}
 			
-			var bed = new Bed(repo.BedID(), crbed.patient, crbed.room());
+			case Bed.Unassign unassign -> {
+				
+				var unassignBed = repo.getBed(unassign.id())
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"));
+				
+				repo.deleteBed(delete.patient());
+				
+				yield unassignBed;
+			}
 			
-			repo.save(bed);
+			case Bed.Assign assign -> {
+				
+				var assignBed  = repo.getBed(assign.id())
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"))
+						.updateWith(update.patient());
+				
+				repo.save(assignBed);
 			
-			yield bed;
+				yield assignBed;
+			}
 			
-		}
-		
-		case Bed.Unassign unassign -> {
+			case Bed.Move move -> {
+				
+				var moveBed  = repo.getBed(move.id())
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"))
+						.updateWith(update.room());
+				
+				repo.save(moveBed);
 			
-			var unassignBed = repo.getBed(unassign.id())
-					.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"));
-			
-			repo.deleteBed(delete.patient());
-			
-			yield unassignBed;
-		}
-		
-		case Bed.Assign assign -> {
-			
-			var assignBed  = repo.getBed(assign.id())
-					.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"))
-					.updateWith(update.patient();
-			
-			repo.save(assignBed);
-		
-			yield assignBed;
-		}};	
-		
-	case Bed.Move move -> {
-		
-		var moveBed  = repo.getBed(move.id())
-				.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"))
-				.updateWith(update.room();
-		
-		repo.save(moveBed);
-	
-		yield moveBed;
-	}};	
+				yield moveBed;
+			}};	
 	
 	}
 	
