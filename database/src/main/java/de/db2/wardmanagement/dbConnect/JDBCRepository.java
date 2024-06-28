@@ -346,12 +346,6 @@ public class JDBCRepository implements Repository {
 	}
 
 	@Override
-	public void assignBed(Id<Bed> id) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void moveBed(Bed bed) {
 		// TODO Auto-generated method stub
 		
