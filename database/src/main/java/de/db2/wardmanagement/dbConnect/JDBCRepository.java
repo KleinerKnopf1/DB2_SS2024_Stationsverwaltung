@@ -351,4 +351,10 @@ public class JDBCRepository implements Repository {
 		
 	}
 
+	@Override
+	public void deleteBed(Id<Bed> id) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }
