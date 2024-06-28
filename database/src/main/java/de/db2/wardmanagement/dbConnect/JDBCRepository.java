@@ -75,7 +75,7 @@ public class JDBCRepository implements Repository {
 			    CREATE TABLE IF NOT EXISTS beds (
 			        bedID UUID PRIMARY KEY,
 			        patient UUID,
-			        roomNr INT REFERENCES rooms(roomNr)
+			        roomId INT REFERENCES rooms(roomId)
 			    );
 			""";
 
@@ -85,7 +85,8 @@ public class JDBCRepository implements Repository {
 			        preName VARCHAR(255),
 			        name VARCHAR(255) NOT NULL,
 			        birthday DATE,
-			        function VARCHAR(255)
+			        function VARCHAR(255),
+			        ward UUID REFERENCES wards(id)
 			    );
 			""";
 
@@ -146,17 +147,17 @@ public class JDBCRepository implements Repository {
 
 //Room methods
 	private static String insertSQL(Room room) {
-		return INSERT_INTO("rooms").VALUE("roomNr", room.id()).VALUE("roomName", room.roomName())
+		return INSERT_INTO("rooms").VALUE("roomId", room.id()).VALUE("roomName", room.roomName())
 				.VALUE("ward", room.ward().id().value()).toString();
 	}
 
 	private static String updateSQL(Room room) {
-		return UPDATE("rooms").WHERE("roomNr", room.id()).SET("roomName", room.roomName())
+		return UPDATE("rooms").WHERE("roomId", room.id()).SET("roomName", room.roomName())
 				.SET("ward", room.ward().id().value()).toString();
 	}
 
 	private static Room readRoom(ResultSet rs) throws SQLException {
-		return new Room(new Id<>(rs.getString("roomNr")), rs.getString("roomName"), Reference.to(rs.getString("ward")));
+		return new Room(new Id<>(rs.getString("roomId")), rs.getString("roomName"), Reference.to(rs.getString("ward")));
 	}
 
 	@Override
@@ -171,7 +172,7 @@ public class JDBCRepository implements Repository {
 
 	private Optional<Room> getRoom(Id<de.db2.wardmanagement.backend.entity.Room> id) {
 		try (var stmt = conn.createStatement();
-				var rs = stmt.executeQuery("SELECT * FROM rooms WHERE roomNr = " + id)) {
+				var rs = stmt.executeQuery("SELECT * FROM rooms WHERE roomId = " + id)) {
 			if (rs.next()) {
 				return Optional.of(readRoom(rs));
 			}
@@ -184,18 +185,18 @@ public class JDBCRepository implements Repository {
 	// Bed methods
 	private static String insertSQL(Bed bed) {
 		return INSERT_INTO("beds").VALUE("bedID", bed.id().value())
-				.VALUE("patient", bed.patient().map(p -> p.id().value()).orElse(null)).VALUE("roomNr", bed.room())
+				.VALUE("patient", bed.patient().map(p -> p.id().value()).orElse(null)).VALUE("roomId", bed.room())
 				.toString();
 	}
 
 	private static String updateSQL(Bed bed) {
 		return UPDATE("beds").WHERE("bedID", bed.id().value())
-				.SET("patient", bed.patient().map(p -> p.id().value()).orElse(null)).SET("roomNr", bed.room())
+				.SET("patient", bed.patient().map(p -> p.id().value()).orElse(null)).SET("roomId", bed.room())
 				.toString();
 	}
 
 	private static Bed readBed(ResultSet rs) throws SQLException {
-		return new Bed(new Id<>(rs.getString("bedID")), Reference.to(rs.getString("roomNr")),  
+		return new Bed(new Id<>(rs.getString("bedID")), Reference.to(rs.getString("roomId")),  
 				rs.getString("patient") != null ? Optional.of(Reference.to(rs.getString("patient"))) : Optional.empty());
 	}
 
