@@ -9,8 +9,9 @@ import de.db2.wardmanagement.backend.type.Reference;
 
 public  record Bed (
 		Id<Bed> id,
-		Optional<Reference<Patient>> patient,
-		Reference<Room> room
+		Reference<Room> room,
+		Optional<Reference<Patient>> patient
+		
 		)
 
 {
@@ -19,7 +20,9 @@ public  record Bed (
 	  public static record Create
 	  (
 		Id<Bed> id,
-	    Reference<Room> room
+	    Reference<Room> room,
+	    Optional<Reference<Patient>> patient
+	    
 	  )
 	  implements Command {}
 	  
@@ -33,7 +36,8 @@ public  record Bed (
 	  public static record Move
 	  (
 		Id<Bed> id,
-		Reference<Room> room
+		Reference<Room> room,
+		Reference<Patient> patient
 	  )
 	  implements Command {}
 
@@ -68,8 +72,8 @@ public  record Bed (
 	    Optional<Bed> getBed(Id<Bed> id);
 	  }
 	  
-	  public Bed updateWith(){
-			return new Bed(this.id, patient(), room());
+	  public Bed updateWith(Reference<Room> newRoom, Optional<Reference<Patient>> newPatient){
+			return new Bed(this.id, newRoom, newPatient);
 		}
 
 }

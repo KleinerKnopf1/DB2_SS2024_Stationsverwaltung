@@ -28,6 +28,8 @@ public interface Repository {
 	Id<Bed> BedID();
 	void save(Bed bed) throws Exception;
 	void unassignBed (Id<Bed>id);
+	void assignBed (Id<Bed>id);
+	void moveBed (Bed bed);
 	List<Bed> get(Bed.Filter filter);
 	Optional<Bed> Bed(Id<Bed> id);
 

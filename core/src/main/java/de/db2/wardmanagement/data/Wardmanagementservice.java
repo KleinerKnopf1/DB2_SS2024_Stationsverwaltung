@@ -5,7 +5,10 @@ import java.util.Optional;
 
 import de.db2.wardmanagement.backend.entity.Bed;
 import de.db2.wardmanagement.backend.entity.Room;
+import de.db2.wardmanagement.backend.entity.Room.Update;
 import de.db2.wardmanagement.backend.entity.Ward;
+import de.db2.wardmanagement.backend.entity.*;
+
 
 import de.db2.wardmanagement.backend.type.Id;
 
@@ -87,7 +90,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 		
 			case Room.Create crroom -> { 
 				
-				var rm = new Room(repo.RoomID(), crroom.name());
+				var rm = new Room(repo.RoomID(), crroom.name(), crroom.ward());
 				
 				repo.save(rm);
 				
@@ -133,7 +136,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 		
 			case Bed.Create crbed -> {
 				
-				var bed = new Bed(repo.BedID(), crbed.patient, crbed.room());
+				var bed = new Bed(repo.BedID(),crbed.room(),crbed.patient());
 				
 				repo.save(bed);
 				
@@ -151,22 +154,12 @@ public class Wardmanagementservice implements IWardmanagementservice {
 				yield unassignBed;
 			}
 			
-			case Bed.Assign assign -> {
-				
-				var assignBed  = repo.Bed(assign.id())
-						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"))
-						.updateWith(update.patient());
-				
-				repo.save(assignBed);
-			
-				yield assignBed;
-			}
 			
 			case Bed.Move move -> {
 				
 				var moveBed  = repo.Bed(move.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"))
-						.updateWith(update.room());
+						.updateWith(move.room(), move.patient());
 				
 				repo.save(moveBed);
 			
