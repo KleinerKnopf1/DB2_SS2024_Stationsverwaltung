@@ -54,7 +54,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 				var deleteWard = repo.getWard(delete.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Ward ID"));
 				
-				repo.deleteWard(delete.id());
+				repo.delete(deleteWard);
 				
 				yield deleteWard;
 			}
@@ -76,7 +76,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 
 	@Override
 	public List<Ward> getWard(Ward.Filter filter) {	
-		return repo.get(filter);
+		return repo.getWard(filter);
 	}
 
 	@Override
@@ -100,17 +100,17 @@ public class Wardmanagementservice implements IWardmanagementservice {
 			
 			case Room.Delete delete -> {
 				
-				var deleteRoom = repo.Room(delete.id())
+				var deleteRoom = repo.getRoom(delete.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Room ID"));
 				
-				repo.deleteRoom(delete.id());
+				repo.delete(deleteRoom);
 				
 				yield deleteRoom;
 			}
 			
 			case Room.Update update -> {
 				
-				var updateRoom  = repo.Room(update.id())
+				var updateRoom  = repo.getRoom(update.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Room ID"))
 						.updateWith(update.name(), update.ward());
 				
@@ -124,12 +124,12 @@ public class Wardmanagementservice implements IWardmanagementservice {
 	
 	@Override
 	public List<Room> getRooms(Room.Filter filter) {
-		return repo.get(filter);
+		return repo.getRoom(filter);
 	}	
 	
 	@Override
 	public Optional<Room> getRoom(Id<Room> id) {
-		return repo.Room(id);
+		return repo.getRoom(id);
 	}
 
 	@Override
@@ -148,18 +148,27 @@ public class Wardmanagementservice implements IWardmanagementservice {
 			
 			case Bed.Unassign unassign -> {
 				
-				var unassignBed = repo.Bed(unassign.id())
+				var unassignBed = repo.getBed(unassign.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"));
-				
-				repo.unassignBed(unassignBed.id());
+				unassignBed.updateWith(unassignBed.room(), Optional.empty());
+				repo.save(unassignBed);
 				
 				yield unassignBed;
 			}
 			
+			case Bed.Assign assign -> {
+				
+				var assignBed = repo.getBed(assign.id())
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"));
+				assignBed.updateWith(assignBed.room(), assign.patient());
+				repo.save(assignBed);
+				
+				yield assignBed;
+			}
 			
 			case Bed.Move move -> {
 				
-				var moveBed  = repo.Bed(move.id())
+				var moveBed  = repo.getBed(move.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"))
 						.updateWith(move.room(), move.patient());
 				
@@ -170,12 +179,12 @@ public class Wardmanagementservice implements IWardmanagementservice {
 			
 			case Bed.Delete delete -> {
 				
-				var deleteRoom = repo.Bed(delete.id())
+				var deleteBed = repo.getBed(delete.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"));
 				
-				repo.deleteBed(delete.id());
+				repo.delete(deleteBed);
 				
-				yield deleteRoom;
+				yield deleteBed;
 			}
 		};	
 	
@@ -183,12 +192,12 @@ public class Wardmanagementservice implements IWardmanagementservice {
 	
 	@Override
 	public List<Bed> getBeds(Bed.Filter filter) {
-		return repo.get(filter);
+		return repo.getBed(filter);
 	}
 	
 	@Override
 	public Optional<Bed> getBed(Id<Bed> id) {
-		return repo.Bed(id);
+		return repo.getBed(id);
 	}  
 }
 

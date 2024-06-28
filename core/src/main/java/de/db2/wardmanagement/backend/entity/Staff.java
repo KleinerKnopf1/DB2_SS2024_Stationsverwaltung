@@ -23,8 +23,8 @@ public record Staff
 	    Optional<String> name,
 	    Optional<String> prename,
 	    Optional<LocalDate> birthday,
-	    Optional<String> function
-	    
+	    Optional<String> function,
+	    Optional<Ward> ward
 	  )
 	  {}
 

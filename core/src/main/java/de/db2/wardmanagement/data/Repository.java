@@ -13,30 +13,29 @@ import de.db2.wardmanagement.backend.type.Id;
 public interface Repository {
 
 	Id<Ward> WardID();
-	void save(Ward ward) throws Exception;
-	void deleteWard(Id<Ward> id);
-	void update(Id<Ward> ward);
-	List<Ward> get(Ward.Filter filter);
-	Optional<Ward> getWard(Id<Ward> id);
-
 	Id<Room> RoomID();
-	void save(Room room) throws Exception;
-	void deleteRoom (Id<Room>id);
-	List<Room> get(Room.Filter filter);
-	Optional<Room> Room(Id<Room> id);
-
 	Id<Bed> BedID();
-	void save(Bed bed) throws Exception;
-	void unassignBed (Id<Bed>id);
-	void moveBed (Bed bed);
-	void deleteBed (Id<Bed>id);
-	List<Bed> get(Bed.Filter filter);
-	Optional<Bed> Bed(Id<Bed> id);
-
 	Id<Staff> StaffID();
+	
+	void save(Ward ward) throws Exception;
+	void save(Room room) throws Exception;
+	void save(Bed bed) throws Exception;
 	void save(Staff staff) throws Exception;
-	List<Staff> get(Staff.Filter filter);
-	Optional<Staff> Staff(Id<Staff> id);
+
+	void delete(Ward ward);
+	void delete (Room room);
+	void delete (Bed bed);
+
+	List<Ward> getWard(Ward.Filter filter);
+	List<Room> getRoom(Room.Filter filter);
+	List<Bed> getBed(Bed.Filter filter);
+	List<Staff> getStaff(Staff.Filter filter);
+
+	Optional<Ward> getWard(Id<Ward> id);
+	Optional<Room> getRoom(Id<Room> id);
+	Optional<Bed> getBed(Id<Bed> id);
+	Optional<Staff> getStaff(Id<Staff> id);
+
 
 	public static interface Provider {
 		Repository instance();
