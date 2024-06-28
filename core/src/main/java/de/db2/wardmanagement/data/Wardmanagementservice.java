@@ -5,9 +5,7 @@ import java.util.Optional;
 
 import de.db2.wardmanagement.backend.entity.Bed;
 import de.db2.wardmanagement.backend.entity.Room;
-import de.db2.wardmanagement.backend.entity.Room.Update;
 import de.db2.wardmanagement.backend.entity.Ward;
-import de.db2.wardmanagement.backend.entity.*;
 
 
 import de.db2.wardmanagement.backend.type.Id;
@@ -173,7 +171,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 			case Bed.Delete delete -> {
 				
 				var deleteRoom = repo.Bed(delete.id())
-						.orElseThrow(() -> new IllegalArgumentException("Invalid Room ID"));
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"));
 				
 				repo.deleteBed(delete.id());
 				
