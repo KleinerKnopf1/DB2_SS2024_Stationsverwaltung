@@ -17,7 +17,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 	private final Personmanagement pm;
 	
 	
-	private Wardmanagementservice(Repository repo, Personmanagement pm){ 
+	public Wardmanagementservice(Repository repo, Personmanagement pm){ 
 		this.repo = repo;
 		this.pm = pm;
 	}
@@ -87,7 +87,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 		
 			case Room.Create crroom -> { 
 				
-				var rm = new Room(repo.RoomID(), crroom.roomName());
+				var rm = new Room(repo.RoomID(), crroom.name());
 				
 				repo.save(rm);
 				
@@ -97,7 +97,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 			
 			case Room.Delete delete -> {
 				
-				var deleteRoom = repo.getRoom(delete.id())
+				var deleteRoom = repo.Room(delete.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Room ID"));
 				
 				repo.deleteRoom(delete.id());
@@ -107,9 +107,9 @@ public class Wardmanagementservice implements IWardmanagementservice {
 			
 			case Room.Update update -> {
 				
-				var updateRoom  = repo.getRoom(update.id())
+				var updateRoom  = repo.Room(update.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Room ID"))
-						.updateWith(update.roomName(), update.ward());
+						.updateWith(update.name(), update.ward());
 				
 				repo.save(updateRoom);
 			
@@ -143,17 +143,17 @@ public class Wardmanagementservice implements IWardmanagementservice {
 			
 			case Bed.Unassign unassign -> {
 				
-				var unassignBed = repo.getBed(unassign.id())
+				var unassignBed = repo.Bed(unassign.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"));
 				
-				repo.deleteBed(delete.patient());
+				repo.unassignBed(unassignBed.id());
 				
 				yield unassignBed;
 			}
 			
 			case Bed.Assign assign -> {
 				
-				var assignBed  = repo.getBed(assign.id())
+				var assignBed  = repo.Bed(assign.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"))
 						.updateWith(update.patient());
 				
@@ -164,7 +164,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 			
 			case Bed.Move move -> {
 				
-				var moveBed  = repo.getBed(move.id())
+				var moveBed  = repo.Bed(move.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"))
 						.updateWith(update.room());
 				

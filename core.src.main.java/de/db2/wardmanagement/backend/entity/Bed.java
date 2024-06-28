@@ -67,5 +67,9 @@ public  record Bed (
 
 	    Optional<Bed> getBed(Id<Bed> id);
 	  }
+	  
+	  public Bed updateWith(){
+			return new Bed(this.id, patient(), room());
+		}
 
 }

@@ -25,7 +25,8 @@ public  record Room (
 	  public static record Update
 	  (
 		Id<Room> id,
-		String name
+		String name,
+		Reference<Ward> ward
 	  )
 	  implements Command {}
 
@@ -53,6 +54,10 @@ public  record Room (
 
 	    Optional<Room> getRoom(Id<Room> id);
 	  }
+	  
+	  public Room updateWith(String newName){
+			return new Room(this.id, newName, ward);
+			}
 	
 
 }
