@@ -37,14 +37,14 @@ public  record Bed (
 	  (
 		Id<Bed> id,
 		Reference<Room> room,
-		Reference<Patient> patient
+		Optional<Reference<Patient>> patient
 	  )
 	  implements Command {}
 
 	  public static record Assign
 	  (
 		Id<Bed> id,
-		Reference<Patient> patient
+		Optional<Reference<Patient>> patient
 	  )
 	  implements Command {}
 	  

@@ -195,10 +195,9 @@ public class JDBCRepository implements Repository {
 	}
 
 	private static Bed readBed(ResultSet rs) throws SQLException {
-      return new Bed(new Id<>(rs.getString("bedID")),
-              rs.getString("patient") != null ? Optional.of(Reference.to(rs.getString("patient"))) : Optional.empty(),
-              Reference.to(rs.getString("roomNr")));
-  }
+		return new Bed(new Id<>(rs.getString("bedID")), Reference.to(rs.getString("roomNr")),  
+				rs.getString("patient") != null ? Optional.of(Reference.to(rs.getString("patient"))) : Optional.empty());
+	}
 
 	@Override
 	public Id<Bed> BedID() {
@@ -242,8 +241,7 @@ public class JDBCRepository implements Repository {
 
 	private static Staff readStaff(ResultSet rs) throws SQLException {
 		return new Staff(new Id<>(rs.getString("staffID")), rs.getString("preName"), rs.getString("name"),
-				rs.getDate("birthday").toLocalDate(), rs.getString("function"),
-				Reference.to(rs.getString("id")));
+				rs.getDate("birthday").toLocalDate(), rs.getString("function"), Reference.to(rs.getString("id")));
 	}
 
 	@Override
@@ -273,28 +271,27 @@ public class JDBCRepository implements Repository {
 		return Optional.empty();
 	}
 
-	
 	@Override
-	public Id<de.db2.wardmanagement.backend.entity.Room> RoomID() {
+	public Id<Room> RoomID() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Optional<de.db2.wardmanagement.backend.entity.Room> Room(Id<de.db2.wardmanagement.backend.entity.Room> id) {
+	public Optional<Room> Room(Id<Room> id) {
 		// TODO Auto-generated method stub
 		return Optional.empty();
 	}
 
 	@Override
-	public Optional<de.db2.wardmanagement.backend.entity.Bed> Bed(Id<de.db2.wardmanagement.backend.entity.Bed> id) {
+	public Optional<Bed> Bed(Id<Bed> id) {
 		// TODO Auto-generated method stub
 		return Optional.empty();
 	}
 
 	@Override
-	public Optional<de.db2.wardmanagement.backend.entity.Staff> Staff(
-			Id<de.db2.wardmanagement.backend.entity.Staff> id) {
+	public Optional<Staff> Staff(
+			Id<Staff> id) {
 		// TODO Auto-generated method stub
 		return Optional.empty();
 	}
@@ -306,22 +303,58 @@ public class JDBCRepository implements Repository {
 	}
 
 	@Override
-	public List<de.db2.wardmanagement.backend.entity.Room> get(de.db2.wardmanagement.backend.entity.Room.Filter arg0) {
+	public List<Room> get(Room.Filter arg0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<de.db2.wardmanagement.backend.entity.Bed> get(de.db2.wardmanagement.backend.entity.Bed.Filter arg0) {
+	public List<Bed> get(Bed.Filter arg0) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<de.db2.wardmanagement.backend.entity.Staff> get(
-			de.db2.wardmanagement.backend.entity.Staff.Filter arg0) {
+	public List<Staff> get(
+			Staff.Filter arg0) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public void deleteWard(Id<Ward> id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void update(Id<Ward> ward) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void deleteRoom(Id<Room> id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void unassignBed(Id<Bed> id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void assignBed(Id<Bed> id) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void moveBed(Bed bed) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
