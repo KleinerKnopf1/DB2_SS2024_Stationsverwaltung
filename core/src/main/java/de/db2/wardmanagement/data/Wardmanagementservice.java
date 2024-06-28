@@ -70,7 +70,9 @@ public class Wardmanagementservice implements IWardmanagementservice {
 				repo.save(updateWard);
 			
 				yield updateWard;
-			}};
+			}
+			
+		};
 	}
 
 
@@ -117,7 +119,9 @@ public class Wardmanagementservice implements IWardmanagementservice {
 				repo.save(updateRoom);
 			
 				yield updateRoom;
-			}};	
+			}
+			
+		};	
 	}
 	
 	@Override
@@ -164,7 +168,18 @@ public class Wardmanagementservice implements IWardmanagementservice {
 				repo.save(moveBed);
 			
 				yield moveBed;
-			}};	
+			}
+			
+			case Bed.Delete delete -> {
+				
+				var deleteRoom = repo.Bed(delete.id())
+						.orElseThrow(() -> new IllegalArgumentException("Invalid Room ID"));
+				
+				repo.deleteBed(delete.id());
+				
+				yield deleteRoom;
+			}
+		};	
 	
 	}
 	

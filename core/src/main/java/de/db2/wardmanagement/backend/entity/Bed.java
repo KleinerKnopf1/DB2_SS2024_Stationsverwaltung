@@ -15,7 +15,7 @@ public  record Bed (
 		)
 
 {
-	public static sealed interface Command permits Create, Delete, Move, Assign, Unassign  {}
+	public static sealed interface Command permits Create, Delete, Move, Unassign  {}
 
 	  public static record Create
 	  (
@@ -41,12 +41,6 @@ public  record Bed (
 	  )
 	  implements Command {}
 
-	  public static record Assign
-	  (
-		Id<Bed> id,
-		Optional<Reference<Patient>> patient
-	  )
-	  implements Command {}
 	  
 	  public static record Unassign
 	  (
