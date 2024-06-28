@@ -150,6 +150,18 @@ public class JDBCRepository implements Repository {
 				.SET("ward", staff.ward()).toString();
 	}
 
+	private static String deleteSQL(Ward ward) {
+		return DELETE_FROM("wards").WHERE("id", ward.id().value()).toString();
+	}
+	
+	private static String deleteSQL(Room room) {
+		return DELETE_FROM("rooms").WHERE("id", room.id().value()).toString();
+	}
+	
+	private static String deleteSQL(Bed bed) {
+		return DELETE_FROM("beds").WHERE("id", bed.id().value()).toString();
+	}
+	
 	private static Ward readWard(ResultSet rs) throws SQLException {
 
 		return new Ward(new Id<>(rs.getString("id")), rs.getString("name"));
@@ -233,20 +245,39 @@ public class JDBCRepository implements Repository {
 
 	@Override
 	public void delete(Ward ward) {
-		// TODO Auto-generated method stub
+		try (var stmt = conn.createStatement()) {
+			if(!getWard(ward.id()).isPresent())
+				return;
+			var sql = deleteSQL(ward);
+			stmt.executeUpdate(sql);
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
 
 	}
 
 	@Override
 	public void delete(Room room) {
-		// TODO Auto-generated method stub
-
+		try (var stmt = conn.createStatement()) {
+			if(!getRoom(room.id()).isPresent())
+				return;
+			var sql = deleteSQL(room);
+			stmt.executeUpdate(sql);
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
 	public void delete(Bed bed) {
-		// TODO Auto-generated method stub
-
+		try (var stmt = conn.createStatement()) {
+			if(!getBed(bed.id()).isPresent())
+				return;
+			var sql = deleteSQL(bed);
+			stmt.executeUpdate(sql);
+		} catch (SQLException e) {
+			throw new RuntimeException(e);
+		}
 	}	
 
 	@Override
