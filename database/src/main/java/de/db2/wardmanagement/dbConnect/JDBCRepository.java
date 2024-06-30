@@ -41,9 +41,9 @@ public class JDBCRepository implements Repository {
 	// Factory method
 	public static JDBCRepository instance() {
 		try {
-			var conn = DriverManager.getConnection(System.getProperty("wardstation.repo.jdbc.url"),
-					System.getProperty("wardstation.repo.jdbc.user"),
-					System.getProperty("wardstation.repo.jdbc.password"));
+			var conn = DriverManager.getConnection(System.getProperty("wardmanagement.repo.jdbc.url"),
+					System.getProperty("wardmanagement.repo.jdbc.user"),
+					System.getProperty("wardmanagement.repo.jdbc.password"));
 
 			var repo = new JDBCRepository(conn);
 

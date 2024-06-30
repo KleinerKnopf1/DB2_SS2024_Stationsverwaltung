@@ -36,7 +36,7 @@ public final class WardmanagementserviceTest {
 
     @Test
     public void testWardLifeCycle() throws Exception {
-        Ward.Command wardCmd = new Ward.Command();
+        Ward.Create wardCmd = new Ward.Create(new Id<Ward>(null));
         wardCmd.setName("Test Ward");
         Ward createdWard = service.process(wardCmd);
         assertNotNull("Created Ward should not be null", createdWard);
