@@ -9,6 +9,7 @@ import de.db2.wardmanagement.backend.entity.Ward;
 
 
 import de.db2.wardmanagement.backend.type.Id;
+import de.db2.wardmanagement.backend.type.Reference;
 
 public class Wardmanagementservice implements IWardmanagementservice {
 	
@@ -80,8 +81,10 @@ public class Wardmanagementservice implements IWardmanagementservice {
 	}
 
 	@Override
-	public Optional<Ward> getWard(Id<Ward> id) {
-		return repo.getWard(id);
+	public Ward getWard(Id<Ward> id) {
+		Ward ward = null;
+		ward = repo.getWard(id).orElseThrow(() -> new IllegalArgumentException("Invalid Ward ID")); 
+		return ward;
 	}
 
 	@Override
@@ -90,7 +93,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 		
 			case Room.Create crroom -> { 
 				
-				var rm = new Room(repo.RoomID(), crroom.name(), crroom.ward());
+				var rm = new Room(repo.RoomID(), crroom.name(), Reference.to(crroom.ward().id().toString()));
 				
 				repo.save(rm);
 				
@@ -128,8 +131,10 @@ public class Wardmanagementservice implements IWardmanagementservice {
 	}	
 	
 	@Override
-	public Optional<Room> getRoom(Id<Room> id) {
-		return repo.getRoom(id);
+	public Room getRoom(Id<Room> id) {
+		Room room = null;
+		room = repo.getRoom(id).orElseThrow(() -> new IllegalArgumentException("Invalid Room ID")); 
+		return room;
 	}
 
 	@Override
@@ -138,7 +143,8 @@ public class Wardmanagementservice implements IWardmanagementservice {
 		
 			case Bed.Create crbed -> {
 				
-				var bed = new Bed(repo.BedID(),crbed.room(),crbed.patient());
+				var bed = new Bed(repo.BedID(), Reference.to(crbed.room().id().toString()), 
+						crbed.patient() == null ? Optional.empty() : Optional.of(Reference.to(crbed.patient().toString())));
 				
 				repo.save(bed);
 				
@@ -160,7 +166,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 				
 				var assignBed = repo.getBed(assign.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"));
-				assignBed.updateWith(assignBed.room(), assign.patient());
+				assignBed.updateWith(assignBed.room(), Optional.of(Reference.to(assign.patient().toString())));
 				repo.save(assignBed);
 				
 				yield assignBed;
@@ -168,9 +174,8 @@ public class Wardmanagementservice implements IWardmanagementservice {
 			
 			case Bed.Move move -> {
 				
-				var moveBed  = repo.getBed(move.id())
-						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"))
-						.updateWith(move.room(), move.patient());
+				var moveBed  = repo.getBed(move.id()).orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"));
+				moveBed.updateWith(Reference.to(move.newRoom().id().toString()), Optional.of(Reference.to(moveBed.patient().toString())));
 				
 				repo.save(moveBed);
 			
@@ -196,8 +201,10 @@ public class Wardmanagementservice implements IWardmanagementservice {
 	}
 	
 	@Override
-	public Optional<Bed> getBed(Id<Bed> id) {
-		return repo.getBed(id);
+	public Bed getBed(Id<Bed> id) {
+		Bed bed = null;
+		bed = repo.getBed(id).orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID")); 
+		return bed;
 	}  
 }
 

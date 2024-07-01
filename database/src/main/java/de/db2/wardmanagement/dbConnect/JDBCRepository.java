@@ -111,7 +111,7 @@ public class JDBCRepository implements Repository {
 
 	// Room methods
 	private static String insertSQL(Room room) {
-		return INSERT_INTO("rooms").VALUE("roomId", room.id()).VALUE("roomName", room.roomName())
+		return INSERT_INTO("rooms").VALUE("roomId", room.id()).VALUE("roomName", room.name())
 				.VALUE("ward", room.ward().id().value()).toString();
 	}
 
@@ -134,7 +134,7 @@ public class JDBCRepository implements Repository {
 	}
 
 	private static String updateSQL(Room room) {
-		return UPDATE("rooms").WHERE("roomId", room.id()).SET("roomName", room.roomName())
+		return UPDATE("rooms").WHERE("roomId", room.id()).SET("roomName", room.name())
 				.SET("ward", room.ward().id().value()).toString();
 	}
 

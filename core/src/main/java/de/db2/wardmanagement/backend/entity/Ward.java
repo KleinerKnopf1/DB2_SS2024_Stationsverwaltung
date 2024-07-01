@@ -8,11 +8,11 @@ public record Ward(Id<Ward> id, String name) {
 	
 	public static sealed interface Command permits Create, Update, Delete  {}
 	
-	public static record Create(Id<Ward> id, String name) implements Command {}
+	public static record Create(String name) implements Command {}
 	
 	public static record Update(Id<Ward> id, String name) implements Command {}
 	
-	public static record Delete(Id<Ward> id, String name) implements Command {}
+	public static record Delete(Id<Ward> id) implements Command {}
 
 	public static record Filter(Optional<String> name) {}
 	
@@ -22,7 +22,7 @@ public record Ward(Id<Ward> id, String name) {
 		
 		List<Ward> getWard(Filter filter);
 		
-		Optional<Ward> getWard(Id<Ward> id);
+		Ward getWard(Id<Ward> id);
 	}
 	
 	

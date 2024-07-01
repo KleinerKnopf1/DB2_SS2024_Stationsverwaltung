@@ -6,59 +6,31 @@ import java.util.Optional;
 import de.db2.wardmanagement.backend.type.Id;
 import de.db2.wardmanagement.backend.type.Reference;
 
-public  record Room (
-		Id<Room> id,
-		String roomName,
-		Reference<Ward> ward
-		)
+public record Room(Id<Room> id, String name, Reference<Ward> ward) {
+	public static sealed interface Command permits Create, Update, Delete {
+	}
 
-{
-	 public static sealed interface Command permits Create, Update, Delete  {}
+	public static record Create(String name, Ward ward) implements Command {
+	}
 
-	  public static record Create
-	  (
-		Id<Room> id,
-		String name,
-		Reference<Ward> ward
-	  )
-	  implements Command {}
-	  
-	  public static record Update
-	  (
-		Id<Room> id,
-		String name,
-		Reference<Ward> ward
-	  )
-	  implements Command {}
+	public static record Update(Id<Room> id, String name, Ward ward) implements Command {
+	}
 
+	public static record Delete(Id<Room> id) implements Command {
+	}
 
-	  public static record Delete
-	  (
-		Id<Room> id
-	  )
-	  implements Command {}
+	public static record Filter(Optional<Reference<Ward>> ward, Optional<String> roomname) {
+	}
 
+	public static interface Operations {
+		Room process(Command cmd) throws Exception;
 
-	  public static record Filter
-	  (
-		Optional<Reference<Ward>> ward,
-		Optional<String> roomname 
-	  )
-	  {}
+		List<Room> getRooms(Filter filter);
 
+		Room getRoom(Id<Room> id);
+	}
 
-	  public static interface Operations
-	  {
-	    Room process(Command cmd) throws Exception;
-
-	    List<Room> getRooms(Filter filter);
-
-	    Optional<Room> getRoom(Id<Room> id);
-	  }
-	  
-	  public Room updateWith(String newName, Reference <Ward> NewWard){
-			return new Room(this.id, newName, NewWard);
-			}
-	
-
+	public Room updateWith(String newName, Ward newWard) {
+		return new Room(this.id, newName, Reference.to(newWard.id().toString()));
+	}
 }
