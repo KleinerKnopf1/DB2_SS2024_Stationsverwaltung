@@ -6,11 +6,11 @@ import java.util.Optional;
 import de.db2.wardmanagement.backend.type.Id;
 import de.db2.wardmanagement.backend.type.Reference;
 
-public record Bed(Id<Bed> id, Reference<Room> room, Optional<Reference<Patient>> patient
+public record Bed(Id<Bed> id, Reference<Room> room, Reference<Patient> patient
 
 )
 
-{
+{	
 	public static sealed interface Command permits Create, Delete, Move, Unassign, Assign {
 	}
 
@@ -42,11 +42,18 @@ public record Bed(Id<Bed> id, Reference<Room> room, Optional<Reference<Patient>>
 
 	public Bed updateWith(Room newRoom, Patient newPatient) {
 		return new Bed(this.id, Reference.to(newRoom.id().toString()),
-				newPatient == null ? Optional.empty() : Optional.of(Reference.to(newPatient.toString())));
+				newPatient == null ? Reference.to(null) : Reference.to(newPatient.toString()));
 	}
 
-	public Bed updateWith(Reference<Room> newRoom, Optional<Reference<Patient>> newPatient) {
+	public Bed updateWith(Reference<Room> newRoom, Reference<Patient> newPatient) {
 		return new Bed(this.id, newRoom, newPatient);
+	}
+	
+	public String toString() {
+		return String.format("Bed[id=%s, room=%s, patient=%s]", 
+				id, 
+				room.toString(), 
+				patient == null || patient.id() == null || patient.id().value() == null ? "null" : patient.toString());
 	}
 
 }

@@ -2,13 +2,14 @@ package de.db2.wardmanagement.data;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.ServiceLoader;
+//import java.util.ServiceLoader;
 
 import de.db2.wardmanagement.backend.entity.Bed;
 import de.db2.wardmanagement.backend.entity.Room;
 import de.db2.wardmanagement.backend.entity.Staff;
 import de.db2.wardmanagement.backend.entity.Ward;
 import de.db2.wardmanagement.backend.type.Id;
+import de.db2.wardmanagement.dbConnect.JDBCRepository;
 
 public interface Repository {
 
@@ -42,9 +43,10 @@ public interface Repository {
 	}
 
 	public static Repository loadInstance(){
-		return ServiceLoader.load(Provider.class)
-				.iterator()
-				.next()
-				.instance();
+		return JDBCRepository.instance();
+//		return ServiceLoader.load(Provider.class)
+//				.iterator()
+//				.next()
+//				.instance();
 	}
 }

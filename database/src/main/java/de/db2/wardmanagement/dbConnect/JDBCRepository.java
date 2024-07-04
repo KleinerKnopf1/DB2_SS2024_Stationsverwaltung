@@ -73,15 +73,15 @@ public class JDBCRepository implements Repository {
 
 	private static final String CREATE_TABLE_BEDS = """
 			    CREATE TABLE IF NOT EXISTS beds (
-			        bedID UUID PRIMARY KEY,
+			        bedId UUID PRIMARY KEY,
 			        patient UUID,
-			        roomId INT REFERENCES rooms(roomId)
+			        roomId UUID REFERENCES rooms(roomId)
 			    );
 			""";
 
 	private static final String CREATE_TABLE_STAFF = """
 			    CREATE TABLE IF NOT EXISTS staff (
-			        staffID UUID PRIMARY KEY,
+			        staffId UUID PRIMARY KEY,
 			        preName VARCHAR(255),
 			        name VARCHAR(255) NOT NULL,
 			        birthday DATE,
@@ -111,20 +111,22 @@ public class JDBCRepository implements Repository {
 
 	// Room methods
 	private static String insertSQL(Room room) {
-		return INSERT_INTO("rooms").VALUE("roomId", room.id()).VALUE("roomName", room.name())
-				.VALUE("ward", room.ward().id().value()).toString();
+		return INSERT_INTO("rooms").VALUE("roomId", room.id().value().toString()).VALUE("roomName", room.name())
+				.VALUE("ward", room.ward().id().value().toString()).toString();
 	}
 
 	// Bed methods
 	private static String insertSQL(Bed bed) {
-		return INSERT_INTO("beds").VALUE("bedID", bed.id().value())
-				.VALUE("patient", bed.patient().map(p -> p.id().value()).orElse(null)).VALUE("roomId", bed.room())
-				.toString();
+		 InsertBuilder ib = INSERT_INTO("beds").VALUE("bedId", bed.id().value().toString())
+				.VALUE("roomId", bed.room().id().toString());
+		 if(bed.patient() != null && bed.patient().id().value() != null)
+			 ib.VALUE("patient", bed.patient().id().value());
+		 return ib.toString();
 	}
 
 	// Staff methods
 	private static String insertSQL(Staff staff) {
-		return INSERT_INTO("staff").VALUE("staffID", staff.id().value()).VALUE("preName", staff.prename())
+		return INSERT_INTO("staff").VALUE("staffId", staff.id().value()).VALUE("preName", staff.prename())
 				.VALUE("name", staff.name()).VALUE("birthday", staff.birthday()).VALUE("function", staff.function())
 				.VALUE("ward", staff.ward()).toString();
 	}
@@ -139,13 +141,15 @@ public class JDBCRepository implements Repository {
 	}
 
 	private static String updateSQL(Bed bed) {
-		return UPDATE("beds").WHERE("bedID", bed.id().value())
-				.SET("patient", bed.patient().map(p -> p.id().value()).orElse(null)).SET("roomId", bed.room())
-				.toString();
+		UpdateBuilder ub = UPDATE("beds").WHERE("bedId", bed.id().value())
+				.SET("roomId", bed.room());
+		if(bed.patient() != null && bed.patient().id().value() != null)
+			ub.SET("patient", bed.patient().id().value());
+		return ub.toString();
 	}
 
 	private static String updateSQL(Staff staff) {
-		return UPDATE("staff").WHERE("staffID", staff.id().value()).SET("preName", staff.prename())
+		return UPDATE("staff").WHERE("staffId", staff.id().value()).SET("preName", staff.prename())
 				.SET("name", staff.name()).SET("birthday", staff.birthday()).SET("function", staff.function())
 				.SET("ward", staff.ward()).toString();
 	}
@@ -155,11 +159,11 @@ public class JDBCRepository implements Repository {
 	}
 	
 	private static String deleteSQL(Room room) {
-		return DELETE_FROM("rooms").WHERE("id", room.id().value()).toString();
+		return DELETE_FROM("rooms").WHERE("roomId", room.id().value()).toString();
 	}
 	
 	private static String deleteSQL(Bed bed) {
-		return DELETE_FROM("beds").WHERE("id", bed.id().value()).toString();
+		return DELETE_FROM("beds").WHERE("bedId", bed.id().value()).toString();
 	}
 	
 	private static Ward readWard(ResultSet rs) throws SQLException {
@@ -172,13 +176,13 @@ public class JDBCRepository implements Repository {
 	}
 
 	private static Bed readBed(ResultSet rs) throws SQLException {
-		return new Bed(new Id<>(rs.getString("bedID")), Reference.to(rs.getString("roomId")),
-				rs.getString("patient") != null ? Optional.of(Reference.to(rs.getString("patient")))
-						: Optional.empty());
+		return new Bed(new Id<>(rs.getString("bedId")), Reference.to(rs.getString("roomId")),
+				rs.getString("patient") != null ? Reference.to(rs.getString("patient"))
+						: null);
 	}
 
 	private static Staff readStaff(ResultSet rs) throws SQLException {
-		return new Staff(new Id<>(rs.getString("staffID")), rs.getString("preName"), rs.getString("name"),
+		return new Staff(new Id<>(rs.getString("staffId")), rs.getString("preName"), rs.getString("name"),
 				rs.getDate("birthday").toLocalDate(), rs.getString("function"), Reference.to(rs.getString("id")));
 	}
 
@@ -367,9 +371,9 @@ public class JDBCRepository implements Repository {
 	public Optional<Ward> getWard(Id<Ward> id) {
 		try (var stmt = conn.createStatement();
 				var rs = stmt.executeQuery("SELECT * FROM wards WHERE id = '" + id.value() + "'")) {
-			if (rs.next()) {
-				return Optional.of(readWard(rs));
-			}
+			if(!rs.isClosed())
+				if (rs.next()) 
+					return Optional.of(readWard(rs));
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
@@ -379,10 +383,10 @@ public class JDBCRepository implements Repository {
 	@Override
 	public Optional<Room> getRoom(Id<Room> id) {
 		try (var stmt = conn.createStatement();
-				var rs = stmt.executeQuery("SELECT * FROM rooms WHERE roomId = " + id)) {
-			if (rs.next()) {
-				return Optional.of(readRoom(rs));
-			}
+				var rs = stmt.executeQuery("SELECT * FROM rooms WHERE roomId = '" + id.value() + "'")) {
+			if(!rs.isClosed())
+				if (rs.next()) 
+					return Optional.of(readRoom(rs));
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
@@ -392,10 +396,10 @@ public class JDBCRepository implements Repository {
 	@Override
 	public Optional<Bed> getBed(Id<Bed> id) {
 		try (var stmt = conn.createStatement();
-				var rs = stmt.executeQuery("SELECT * FROM beds WHERE bedID = '" + id.value() + "'")) {
-			if (rs.next()) {
-				return Optional.of(readBed(rs));
-			}
+				var rs = stmt.executeQuery("SELECT * FROM beds WHERE bedId = '" + id.value() + "'")) {
+			if(!rs.isClosed())
+				if (rs.next()) 
+					return Optional.of(readBed(rs));
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}
@@ -405,10 +409,10 @@ public class JDBCRepository implements Repository {
 	@Override
 	public Optional<Staff> getStaff(Id<Staff> id) {
 		try (var stmt = conn.createStatement();
-				var rs = stmt.executeQuery("SELECT * FROM staff WHERE staffID = '" + id.value() + "'")) {
-			if (rs.next()) {
-				return Optional.of(readStaff(rs));
-			}
+				var rs = stmt.executeQuery("SELECT * FROM staff WHERE staffId = '" + id.value() + "'")) {
+			if(!rs.isClosed())
+				if (rs.next()) 
+					return Optional.of(readStaff(rs));
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		}

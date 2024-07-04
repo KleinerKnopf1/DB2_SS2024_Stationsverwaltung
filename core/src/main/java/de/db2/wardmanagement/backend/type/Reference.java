@@ -23,5 +23,11 @@ Optional<String> display
 	Optional.empty()
 	);
 	}
+	
+	@Override
+	public String toString() {
+		return id.value().toString();
+		
+	}
 
 }

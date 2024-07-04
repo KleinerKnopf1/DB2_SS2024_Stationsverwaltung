@@ -218,7 +218,10 @@ public abstract class sql {
 
 	    public <T> InsertBuilder VALUE(String col, T t){
 	      columns.add(col);
-	      values.add(valueOf(t));
+	      if(t != null)
+	    	  values.add(valueOf(t));
+	      else 
+	    	  values.add("");
 	      return this;
 	    }  
 
@@ -338,7 +341,7 @@ public abstract class sql {
 	    public String toString(){
 
 	      var sql =     
-	        "DELETE FROM" + table;
+	        "DELETE FROM " + table;
 
 	      return sql +
 	        Optional.of(criteria)

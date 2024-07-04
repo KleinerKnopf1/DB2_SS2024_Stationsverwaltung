@@ -1,7 +1,6 @@
 package de.db2.wardmanagement.data;
 
 import java.util.List;
-import java.util.Optional;
 
 import de.db2.wardmanagement.backend.entity.Bed;
 import de.db2.wardmanagement.backend.entity.Room;
@@ -16,18 +15,18 @@ public class Wardmanagementservice implements IWardmanagementservice {
 	
 	private final Repository repo;
 	@SuppressWarnings("unused")
-	private final Personmanagement pm;
+	//private final Personmanagement pm;
 	
 	
-	public Wardmanagementservice(Repository repo, Personmanagement pm){ 
+	public Wardmanagementservice(Repository repo/*, Personmanagement pm*/){ 
 		this.repo = repo;
-		this.pm = pm;
+		//this.pm = pm;
 	}
 	
 	
 	private static final Wardmanagementservice INSTANCE = new Wardmanagementservice(
-			Repository.loadInstance(), 
-			Personmanagement.loadInstance()
+			Repository.loadInstance()/*, 
+			Personmanagement.loadInstance()*/
 			);
 
 	
@@ -144,7 +143,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 			case Bed.Create crbed -> {
 				
 				var bed = new Bed(repo.BedID(), Reference.to(crbed.room().id().toString()), 
-						crbed.patient() == null ? Optional.empty() : Optional.of(Reference.to(crbed.patient().toString())));
+						crbed.patient() == null ? Reference.to(null) : Reference.to(crbed.patient().toString()));
 				
 				repo.save(bed);
 				
@@ -156,7 +155,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 				
 				var unassignBed = repo.getBed(unassign.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"));
-				unassignBed.updateWith(unassignBed.room(), Optional.empty());
+				unassignBed = unassignBed.updateWith(unassignBed.room(), null);
 				repo.save(unassignBed);
 				
 				yield unassignBed;
@@ -166,7 +165,7 @@ public class Wardmanagementservice implements IWardmanagementservice {
 				
 				var assignBed = repo.getBed(assign.id())
 						.orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"));
-				assignBed.updateWith(assignBed.room(), Optional.of(Reference.to(assign.patient().toString())));
+				assignBed = assignBed.updateWith(assignBed.room(), Reference.to(assign.patient().toString()));
 				repo.save(assignBed);
 				
 				yield assignBed;
@@ -175,7 +174,8 @@ public class Wardmanagementservice implements IWardmanagementservice {
 			case Bed.Move move -> {
 				
 				var moveBed  = repo.getBed(move.id()).orElseThrow(() -> new IllegalArgumentException("Invalid Bed ID"));
-				moveBed.updateWith(Reference.to(move.newRoom().id().toString()), Optional.of(Reference.to(moveBed.patient().toString())));
+				moveBed = moveBed.updateWith(Reference.to(move.newRoom().id().toString()), 
+						Reference.to(moveBed.patient() != null ? moveBed.patient().toString() : null));
 				
 				repo.save(moveBed);
 			
